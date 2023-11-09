@@ -1,0 +1,38 @@
+data:
+  root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
+  version: 19 # 19 or 15
+  data_type: 'time_frame' # 'time_frame' or 'CQT'
+
+model:
+  architecture: 'inception'
+  size: 'default'
+  shared_first_last: True
+  dim: 1
+  conv1: {'in_channels': 1, 'out_channels': 16, 'kernel_size': 7, 'padding': 3, 'bias': False}
+  bn1: {'num_features': 16}
+  inception:
+    blocks: [{'in_channels': 16, 'out_channels': 32, 'max_pool_ks': 4, 'blocks': [{'kernel_size': 3, 'dilation': 1, 'padding': 1}, 
+                                                                                  {'kernel_size': 3, 'dilation': 2, 'padding': 2},
+                                                                                  {'kernel_size': 3, 'dilation': 4, 'padding': 4},
+                                                                                  {'kernel_size': 3, 'dilation': 8, 'padding': 8}]},
+             {'in_channels': 32, 'out_channels': 64, 'max_pool_ks': 4, 'blocks': [{'kernel_size': 3, 'dilation': 1, 'padding': 1},
+                                                                                  {'kernel_size': 3, 'dilation': 2, 'padding': 2},
+                                                                                  {'kernel_size': 3, 'dilation': 4, 'padding': 4},
+                                                                                  {'kernel_size': 3, 'dilation': 8, 'padding': 8}]},
+             {'in_channels': 64, 'out_channels': 128, 'max_pool_ks': 4, 'blocks': [{'kernel_size': 3, 'dilation': 1, 'padding': 1},
+                                                                                   {'kernel_size': 3, 'dilation': 2, 'padding': 2},
+                                                                                   {'kernel_size': 3, 'dilation': 4, 'padding': 4}, 
+                                                                                   {'kernel_size': 3, 'dilation': 8, 'padding': 8}]},
+             {'in_channels': 128, 'out_channels': 128, 'max_pool_ks': 375, 'blocks': [{'kernel_size': 3, 'dilation': 1, 'padding': 1},
+                                                                                      {'kernel_size': 3, 'dilation': 2, 'padding': 2},
+                                                                                      {'kernel_size': 3, 'dilation': 4, 'padding': 4},
+                                                                                      {'kernel_size': 3, 'dilation': 8, 'padding': 8}]}]
+  fc1: {'in_features': 128, 'out_features': 64}
+  fc2: {'in_features': 64, 'out_features': 32}
+  out: {'in_features': 32, 'out_features': 2}
+  activation: 'softmax'
+
+batch_size: 32
+num_workers: 8
+num_epochs: 2
+lr: 0.001
