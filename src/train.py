@@ -37,7 +37,7 @@ def train(config, config_name):
     loss_type = "WCE"  # {'WCE', 'mixup'}
 
     print(
-        "Training data: {} {}, Date type: {}. Training started...".format(
+        "Training data: {} {}, Data type: {}. Training started...".format(
             config.data.root_dir, config.data.version, config.data.data_type
         )
     )
@@ -69,6 +69,7 @@ def train(config, config_name):
     f = open("{}/{}.csv".format(log_path, time_name), "w+")
 
     print("Training started...")
+    best_model_save_path = ""
     for epoch in range(num_epoch):
         Net.train()
         t = time.time()
@@ -152,6 +153,7 @@ def train(config, config_name):
                 },
                 ("{}/{}".format(save_path, net_str)),
             )
+            best_model_save_path = "{}/{}".format(save_path, net_str)
 
         elapsed = time.time() - t
 
@@ -173,7 +175,7 @@ def train(config, config_name):
         print(print_str)
         df = pd.DataFrame([print_str])
         df.to_csv(
-            "{}/{}.csv".format(log_path, time_name)
+            "{}/{}.csv".format(log_path, time_name),
             sep=" ",
             mode="a",
             header=False,
@@ -187,3 +189,4 @@ def train(config, config_name):
     plt.show()
 
     print("End of training.")
+    print("Best model saved at: {}".format(best_model_save_path))

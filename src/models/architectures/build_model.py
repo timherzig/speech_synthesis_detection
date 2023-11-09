@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 # from src.models.architectures.res2next_block import res2next
 # from src.models.architectures.convnext_block import convnext
-# from src.models.architectures.convnextv2_block import convnextv2
+from src.models.architectures.convnextv2_block import convnextv2
 from src.models.architectures.resnet_block import resnet
 from src.models.architectures.inception_block import inception
 from src.models.architectures.wav2vec2_block import wav2vec2
@@ -88,8 +88,8 @@ class build_model(nn.Module):
             self.layers.append(inception(self.config))
         # elif self.config.model.architecture == "res2next":
         #     self.layers.append(res2next(self.config))
-        # elif self.config.model.architecture == "convnextv2":
-        #     self.layers.append(convnextv2(self.config))
+        elif self.config.model.architecture == "convnextv2":
+            self.layers.append(convnextv2(self.config))
         # elif self.config.model.architecture == "convnext":
         #     self.layers.append(convnext(self.config))
         elif self.config.model.architecture == "wav2vec2":
