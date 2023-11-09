@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -20,7 +21,9 @@ def train(config):
         os.makedirs("./trained_models/")
 
     # Get dataloaders
-    train_loader, dev_loader, eval_loader = get_dataloaders(config, device)
+    train_loader, dev_loader, eval_loader, class_weights = get_dataloaders(
+        config, device
+    )
 
     Net = get_model(config).to(device)
 
@@ -43,13 +46,13 @@ def train(config):
     loss_per_epoch = torch.zeros(
         num_epoch,
     )
-    best_d_eer = [0.09, 0]
+    best_d_eer = [0.99, 0]
 
     time_name = time.ctime()
     time_name = time_name.replace(" ", "_")
     time_name = time_name.replace(":", "_")
 
-    path = "./trained_models/LA_{}/{}/{}/".format(
+    path = "./trained_models/LA_{}/{}/{}".format(
         config.data.version, config.model.architecture, config.model.size
     )
 
@@ -60,6 +63,9 @@ def train(config):
     if not os.path.exists(log_path):
         os.makedirs(log_path)
 
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     f = open("{}/{}.csv".format(log_path, time_name), "w+")
 
     # for epoch in range(check_point['epoch']+1, num_epoch):
@@ -69,7 +75,7 @@ def train(config):
         t = time.time()
         total_loss = 0
         counter = 0
-        for batch in train_loader:
+        for batch in tqdm(train_loader):
             counter += 1
             # forward
             samples, labels, _ = batch
@@ -92,7 +98,7 @@ def train(config):
                 ) * F.cross_entropy(preds, labels_b)
             else:
                 preds = Net(samples)
-                loss = F.cross_entropy(preds, labels, weight=weights)
+                loss = F.cross_entropy(preds, labels, weight=class_weights)
                 # loss = F.cross_entropy(preds, labels)
 
             # backward

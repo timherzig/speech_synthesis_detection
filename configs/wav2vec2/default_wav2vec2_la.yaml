@@ -1,0 +1,21 @@
+data:
+  root_dir: '/netscratch/herzig/datasets/LA/' #'/ds/LA/'
+  version: 19 # 19 or 15
+  data_type: 'time_frame' # 'time_frame' (dim 1) or 'CQT' (dim 2)
+
+model:
+  architecture: 'wav2vec2'
+  size: 'default'
+  shared_first_last: False
+  dim: 1
+  wav2vec2:
+    name: 'wav2vec2'
+    pretrained: 'facebook/wav2vec2-base-960h'
+    # config:
+  activation: 'softmax'
+
+
+batch_size: 64
+num_workers: 8
+num_epochs: 100
+lr: 0.001

@@ -1,5 +1,5 @@
 from torch.utils.data.dataloader import DataLoader
-from data.LA_Data import PrepASV19Dataset, PrepASV15Dataset
+from src.data.LA_Data import PrepASV19Dataset, PrepASV15Dataset
 
 
 def get_dataloaders(config, device):

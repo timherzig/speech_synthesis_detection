@@ -1,5 +1,5 @@
 data:
-  root_dir: '/netscratch/herzig/datasets/LA' # '/ds/LA/'
+  root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
   version: 19 # 19 or 15
   data_type: 'time_frame' # 'time_frame' or 'CQT'
 
@@ -34,5 +34,5 @@ model:
 
 batch_size: 32
 num_workers: 8
-num_epochs: 1
+num_epochs: 2
 lr: 0.001

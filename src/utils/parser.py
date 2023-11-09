@@ -20,4 +20,12 @@ def parse_args():
         help="Path to experiment config",
     )
 
+    # Checkpoint path for testing
+    parser.add_argument(
+        "--checkpoint",
+        default=None,
+        type=str,
+        help="Path to checkpoint to test",
+    )
+
     return parser.parse_args()
