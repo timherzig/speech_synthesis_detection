@@ -1,0 +1,32 @@
+data:
+  root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
+  version: 19 # 19 or 15
+  data_type: 'CQT' # 'time_frame' or 'CQT'
+
+model:
+  architecture: 'convnextv2'
+  size: 'default'
+  shared_first_last: False
+  dim: 1
+  convnextv2:
+    name: 'convnextv2'
+    pretrained: 'facebook/convnextv2-tiny-1k-224'
+    config:
+      num_channels: 1
+      patch_size: 4
+      num_stages: 4
+      hidden_sizes: null
+      depths: null
+      hidden_act: 'gelu'
+      initializer_range: 0.02
+      layer_norm_eps: 1.e-12
+      drop_path_rate: 0.0
+      image_size: 224
+      out_features: ['stage4']
+      out_indices: [1]
+  activation: 'softmax'
+
+batch_size: 32
+num_workers: 8
+num_epochs: 2
+lr: 0.001
