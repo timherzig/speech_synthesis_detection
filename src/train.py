@@ -115,6 +115,8 @@ def train(config):
         )
 
         d_eer = cal_roc_eer(d_probs, show_plot=False)
+        e_eer = 0.99
+        eval_accuracy = 0.00
         if d_eer <= best_d_eer[0]:
             best_d_eer[0] = d_eer
             best_d_eer[1] = int(epoch)
@@ -125,35 +127,32 @@ def train(config):
                 data_loader=eval_loader,
             )
             e_eer = cal_roc_eer(e_probs, show_plot=False)
-        else:
-            e_eer = 0.99
-            eval_accuracy = 0.00
 
-        net_str = (
-            config.data.data_type
-            + "_"
-            + str(epoch)
-            + "_"
-            + "ASVspoof20"
-            + str(config.data.version)
-            + "_LA_Loss_"
-            + str(round(total_loss / counter, 4))
-            + "_dEER_"
-            + str(round(d_eer * 100, 2))
-            + "%_eEER_"
-            + str(round(e_eer * 100, 2))
-            + "%.pth"
-        )
-        torch.save(
-            {
-                "epoch": epoch,
-                "model_state_dict": Net.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "scheduler_state_dict": scheduler.state_dict(),
-                "loss": loss_per_epoch,
-            },
-            ("{}/{}".format(save_path, net_str)),
-        )
+            net_str = (
+                config.data.data_type
+                + "_"
+                + str(epoch)
+                + "_"
+                + "ASVspoof20"
+                + str(config.data.version)
+                + "_LA_Loss_"
+                + str(round(total_loss / counter, 4))
+                + "_dEER_"
+                + str(round(d_eer * 100, 2))
+                + "%_eEER_"
+                + str(round(e_eer * 100, 2))
+                + "%.pth"
+            )
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": Net.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "loss": loss_per_epoch,
+                },
+                ("{}/{}".format(save_path, net_str)),
+            )
 
         elapsed = time.time() - t
 
