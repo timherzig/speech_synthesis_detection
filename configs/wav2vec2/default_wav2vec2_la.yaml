@@ -15,7 +15,7 @@ model:
   activation: 'softmax'
 
 
-batch_size: 64
+batch_size: 32
 num_workers: 8
 num_epochs: 100
 lr: 0.001
