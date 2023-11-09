@@ -1,6 +1,7 @@
 import torch
 
 from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
+from src.utils.temperature_scaling import ModelWithTemperature
 from src.data.data import get_dataloaders
 from src.models.model import get_model
 
@@ -9,7 +10,7 @@ def test(config, checkpoint):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Get dataloaders
-    _, _, eval_loader, _ = get_dataloaders(config, device)
+    _, dev_loader, eval_loader, _ = get_dataloaders(config, device)
 
     Net = get_model(config).to(device)
 
@@ -30,4 +31,22 @@ def test(config, checkpoint):
 
     eer = cal_roc_eer(probabilities, show_plot=False)
 
-    return eer * 100
+    print(
+        "EER without temperature scaling: {:.2f}% for {}.".format(eer * 100, checkpoint)
+    )
+
+    # Temperature scaling
+    Net = ModelWithTemperature(Net)
+    Net.set_temperature(dev_loader)
+
+    accuracy, probabilities = asv_cal_accuracies(
+        net=Net,
+        device=device,
+        data_loader=eval_loader,
+    )
+
+    eer = cal_roc_eer(probabilities, show_plot=False)
+
+    print("EER with temperature scaling: {:.2f}% for {}.".format(eer * 100, checkpoint))
+
+    return
