@@ -14,7 +14,7 @@ from src.data.data import get_dataloaders
 from src.models.model import get_model
 
 
-def train(config):
+def train(config, config_name):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if not os.path.exists("./trained_models/"):
@@ -53,7 +53,7 @@ def train(config):
     time_name = time_name.replace(":", "_")
 
     path = "./trained_models/LA_{}/{}/{}".format(
-        config.data.version, config.model.architecture, config.model.size
+        config.data.version, config.model.architecture, config_name
     )
 
     log_path = "{}/log".format(path)
@@ -68,7 +68,6 @@ def train(config):
 
     f = open("{}/{}.csv".format(log_path, time_name), "w+")
 
-    # for epoch in range(check_point['epoch']+1, num_epoch):
     print("Training started...")
     for epoch in range(num_epoch):
         Net.train()
@@ -174,7 +173,11 @@ def train(config):
         print(print_str)
         df = pd.DataFrame([print_str])
         df.to_csv(
-            log_path + time_name + ".csv", sep=" ", mode="a", header=False, index=False
+            "{}/{}.csv".format(log_path, time_name)
+            sep=" ",
+            mode="a",
+            header=False,
+            index=False,
         )
 
         scheduler.step()

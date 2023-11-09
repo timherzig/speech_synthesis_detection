@@ -10,7 +10,7 @@ if __name__ == "__main__":
     if args.task == "train":
         from src.train import train
 
-        train(config)
+        train(config, args.config.split("/")[-1].split(".")[0]
 
     elif args.task == "test":
         from src.test import test
