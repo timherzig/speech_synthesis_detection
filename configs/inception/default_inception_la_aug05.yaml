@@ -1,7 +1,7 @@
 data:
-  root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
+  root_dir: '/netscratch/herzig/datasets/LA/' #'/ds/LA/'
   version: 19 # 19 or 15
-  data_type: 'time_frame' # 'time_frame' or 'CQT'
+  data_type: 'time_frame' # 'time_frame' or 'CQT' (dim 1) or 'CQT' (dim 2)
   aug_prob: 0.5
 
 model:
@@ -33,7 +33,7 @@ model:
   out: {'in_features': 32, 'out_features': 2}
   activation: 'softmax'
 
-batch_size: 32
+batch_size: 128
 num_workers: 8
-num_epochs: 2
+num_epochs: 100
 lr: 0.001

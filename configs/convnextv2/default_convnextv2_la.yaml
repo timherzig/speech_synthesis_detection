@@ -2,6 +2,7 @@ data:
   root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
   version: 19 # 19 or 15
   data_type: 'CQT' # 'time_frame' or 'CQT'
+  aug_prob: 0.0
 
 model:
   architecture: 'convnextv2'

@@ -13,7 +13,7 @@ model:
     name: 'wav2vec2'
     pretrained: 'facebook/wav2vec2-base-960h'
     # config:
-  activation: 'softmax'
+  activation: 'logsoftmax'
 
 
 batch_size: 32
