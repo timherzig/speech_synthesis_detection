@@ -1,6 +1,6 @@
 import os
-from tqdm import tqdm
 import torch
+import shutil
 import torch.optim as optim
 import torch.nn.functional as F
 
@@ -9,9 +9,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
-from src.data.data import get_dataloaders
+from tqdm import tqdm
+from src.test import test
 from src.models.model import get_model
+from src.data.data import get_dataloaders
+from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
 
 
 def train(config, config_name):
@@ -55,6 +57,10 @@ def train(config, config_name):
     path = "./trained_models/LA_{}/{}/{}".format(
         config.data.version, config.model.architecture, config_name
     )
+
+    if config_name == "default":
+        path = "./trained_models/debug"
+        shutil.rmtree(path, ignore_errors=True)
 
     log_path = "{}/log".format(path)
 
@@ -190,3 +196,5 @@ def train(config, config_name):
 
     print("End of training.")
     print("Best model saved at: {}".format(best_model_save_path))
+
+    test(config, best_model_save_path)

@@ -8,6 +8,7 @@ from src.models.model import get_model
 
 def test(config, checkpoint):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    test_out_file = "/".join(checkpoint.split("/")[:-2]) + "/test.txt"
 
     # Get dataloaders
     _, dev_loader, eval_loader, _ = get_dataloaders(config, device)
@@ -29,10 +30,12 @@ def test(config, checkpoint):
         data_loader=eval_loader,
     )
 
-    eer = cal_roc_eer(probabilities, show_plot=False)
+    pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
     print(
-        "EER without temperature scaling: {:.2f}% for {}.".format(eer * 100, checkpoint)
+        "EER without temperature scaling: {:.2f}% for {}.".format(
+            pre_ts_eer * 100, checkpoint
+        )
     )
 
     # Temperature scaling
@@ -45,8 +48,24 @@ def test(config, checkpoint):
         data_loader=eval_loader,
     )
 
-    eer = cal_roc_eer(probabilities, show_plot=False)
+    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print("EER with temperature scaling: {:.2f}% for {}.".format(eer * 100, checkpoint))
+    print(
+        "EER with temperature scaling: {:.2f}% for {}.".format(
+            post_ts_eer * 100, checkpoint
+        )
+    )
+
+    with open(test_out_file, "w") as f:
+        f.write(
+            "EER without temperature scaling: {:.2f}% for {}.\n".format(
+                pre_ts_eer * 100, checkpoint
+            )
+        )
+        f.write(
+            "EER with temperature scaling: {:.2f}% for {}.\n".format(
+                post_ts_eer * 100, checkpoint
+            )
+        )
 
     return

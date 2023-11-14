@@ -1,5 +1,6 @@
 from torch.utils.data.dataloader import DataLoader
 from src.data.LA_Data import PrepASV19Dataset, PrepASV15Dataset
+from src.data.collate import collate_function
 
 
 def get_dataloaders(config, device):
@@ -86,6 +87,7 @@ def get_dataloaders(config, device):
         batch_size=config.batch_size,
         shuffle=True,
         num_workers=config.num_workers,
+        collate_fn=lambda x: collate_function(x, config),
     )
     dev_loader = DataLoader(
         dev_set,
