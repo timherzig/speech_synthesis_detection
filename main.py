@@ -10,13 +10,12 @@ if __name__ == "__main__":
     if args.task == "train":
         from src.train import train
 
-        train(config)
+        train(config, args.config.split("/")[-1].split(".")[0])
 
     elif args.task == "test":
         from src.test import test
 
-        eer = test(config, args.checkpoint)
-        print("EER: {:.2f}% for {}.".format(eer * 100, args.checkpoint))
+        test(config, args.checkpoint)
 
     else:
         raise NotImplementedError(f"{args.task} task not implemented")

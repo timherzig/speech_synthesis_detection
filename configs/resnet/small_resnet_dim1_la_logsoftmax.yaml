@@ -6,25 +6,23 @@ data:
 
 model:
   architecture: 'resnet'
-  size: 'default'
+  size: 'small'
   shared_first_last: True
   dim: 1
   conv1: {'in_channels': 1, 'out_channels': 16, 'kernel_size': 7, 'padding': 3, 'bias': False}
   bn1: {'num_features': 16}
   resnet:
     blocks: [{'in_channels': 16, 'out_channels': 32, 'max_pool_ks': 4},
-             {'in_channels': 32, 'out_channels': 64, 'max_pool_ks': 4},
-             {'in_channels': 64, 'out_channels': 128, 'max_pool_ks': 4},
-             {'in_channels': 128, 'out_channels': 128, 'max_pool_ks': 375}]
+             {'in_channels': 32, 'out_channels': 64, 'max_pool_ks': 4},]
     conv_kernel_size: 3
     padding: 1
-  fc1: {'in_features': 128, 'out_features': 64}
-  fc2: {'in_features': 64, 'out_features': 32}
-  out: {'in_features': 32, 'out_features': 2}
-  activation: 'softmax'
+  fc1: {'in_features': 64, 'out_features': 32}
+  fc2: {'in_features': 32, 'out_features': 16}
+  out: {'in_features': 16, 'out_features': 2}
+  activation: 'logsoftmax'
 
 
-batch_size: 64
+batch_size: 128
 num_workers: 8
 num_epochs: 100
 lr: 0.001

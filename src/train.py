@@ -1,6 +1,6 @@
 import os
-from tqdm import tqdm
 import torch
+import shutil
 import torch.optim as optim
 import torch.nn.functional as F
 
@@ -9,12 +9,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
-from src.data.data import get_dataloaders
+from tqdm import tqdm
+from src.test import test
 from src.models.model import get_model
+from src.data.data import get_dataloaders
+from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
 
 
-def train(config):
+def train(config, config_name):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if not os.path.exists("./trained_models/"):
@@ -37,7 +39,7 @@ def train(config):
     loss_type = "WCE"  # {'WCE', 'mixup'}
 
     print(
-        "Training data: {} {}, Date type: {}. Training started...".format(
+        "Training data: {} {}, Data type: {}. Training started...".format(
             config.data.root_dir, config.data.version, config.data.data_type
         )
     )
@@ -53,8 +55,15 @@ def train(config):
     time_name = time_name.replace(":", "_")
 
     path = "./trained_models/LA_{}/{}/{}".format(
-        config.data.version, config.model.architecture, config.model.size
+        config.data.version, config.model.architecture, config_name
     )
+
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+
+    if config_name == "default":
+        path = "./trained_models/debug"
+        shutil.rmtree(path, ignore_errors=True)
 
     log_path = "{}/log".format(path)
 
@@ -68,8 +77,8 @@ def train(config):
 
     f = open("{}/{}.csv".format(log_path, time_name), "w+")
 
-    # for epoch in range(check_point['epoch']+1, num_epoch):
     print("Training started...")
+    best_model_save_path = ""
     for epoch in range(num_epoch):
         Net.train()
         t = time.time()
@@ -115,6 +124,8 @@ def train(config):
         )
 
         d_eer = cal_roc_eer(d_probs, show_plot=False)
+        e_eer = 0.99
+        eval_accuracy = 0.00
         if d_eer <= best_d_eer[0]:
             best_d_eer[0] = d_eer
             best_d_eer[1] = int(epoch)
@@ -125,35 +136,33 @@ def train(config):
                 data_loader=eval_loader,
             )
             e_eer = cal_roc_eer(e_probs, show_plot=False)
-        else:
-            e_eer = 0.99
-            eval_accuracy = 0.00
 
-        net_str = (
-            config.data.data_type
-            + "_"
-            + str(epoch)
-            + "_"
-            + "ASVspoof20"
-            + str(config.data.version)
-            + "_LA_Loss_"
-            + str(round(total_loss / counter, 4))
-            + "_dEER_"
-            + str(round(d_eer * 100, 2))
-            + "%_eEER_"
-            + str(round(e_eer * 100, 2))
-            + "%.pth"
-        )
-        torch.save(
-            {
-                "epoch": epoch,
-                "model_state_dict": Net.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "scheduler_state_dict": scheduler.state_dict(),
-                "loss": loss_per_epoch,
-            },
-            ("{}/{}".format(save_path, net_str)),
-        )
+            net_str = (
+                config.data.data_type
+                + "_"
+                + str(epoch)
+                + "_"
+                + "ASVspoof20"
+                + str(config.data.version)
+                + "_LA_Loss_"
+                + str(round(total_loss / counter, 4))
+                + "_dEER_"
+                + str(round(d_eer * 100, 2))
+                + "%_eEER_"
+                + str(round(e_eer * 100, 2))
+                + "%.pth"
+            )
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": Net.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "loss": loss_per_epoch,
+                },
+                ("{}/{}".format(save_path, net_str)),
+            )
+            best_model_save_path = "{}/{}".format(save_path, net_str)
 
         elapsed = time.time() - t
 
@@ -175,7 +184,11 @@ def train(config):
         print(print_str)
         df = pd.DataFrame([print_str])
         df.to_csv(
-            log_path + time_name + ".csv", sep=" ", mode="a", header=False, index=False
+            "{}/{}.csv".format(log_path, time_name),
+            sep=" ",
+            mode="a",
+            header=False,
+            index=False,
         )
 
         scheduler.step()
@@ -185,3 +198,6 @@ def train(config):
     plt.show()
 
     print("End of training.")
+    print("Best model saved at: {}".format(best_model_save_path))
+
+    test(config, best_model_save_path)
