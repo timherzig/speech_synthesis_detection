@@ -58,6 +58,9 @@ def train(config, config_name):
         config.data.version, config.model.architecture, config_name
     )
 
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+
     if config_name == "default":
         path = "./trained_models/debug"
         shutil.rmtree(path, ignore_errors=True)
