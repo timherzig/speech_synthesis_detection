@@ -15,7 +15,7 @@ if __name__ == "__main__":
     elif args.task == "test":
         from src.test import test
 
-        test(config, args.checkpoint)
+        test(config, args.checkpoint, args.test)
 
     else:
         raise NotImplementedError(f"{args.task} task not implemented")

@@ -10,6 +10,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from tqdm import tqdm
+from omegaconf import OmegaConf
+
 from src.test import test
 from src.models.model import get_model
 from src.data.data import get_dataloaders
@@ -190,6 +192,7 @@ def train(config, config_name):
             header=False,
             index=False,
         )
+        OmegaConf.save(config, os.path.join(path, "config.yaml"))
 
         scheduler.step()
 

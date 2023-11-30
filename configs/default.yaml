@@ -1,6 +1,6 @@
 data:
-  root_dir: '/netscratch/herzig/datasets/LA/' # '/ds/LA/'
-  version: 19 # 19 or 15
+  root_dir: '/ds/audio/LA_19/'
+  version: 19 # 19 or 15 (21 for testing)
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.5
 

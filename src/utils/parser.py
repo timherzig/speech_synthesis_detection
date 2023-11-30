@@ -28,4 +28,12 @@ def parse_args():
         help="Path to checkpoint to test",
     )
 
+    # Which tests to perform
+    parser.add_argument(
+        "--test",
+        default="all",
+        type=str,
+        help="Which tests to perform (19/21/all)",
+    )
+
     return parser.parse_args()
