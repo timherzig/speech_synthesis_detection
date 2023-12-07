@@ -53,9 +53,9 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    with open(test_out_file, "a") as f:
+    with open(test_out_file, "w") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -66,6 +66,9 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER with temperature scaling: {:.2f}% for {}.\n".format(
                 post_ts_eer * 100, checkpoint
             )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
@@ -107,7 +110,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -118,6 +121,9 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER with temperature scaling: {:.2f}% for {}.\n".format(
                 post_ts_eer * 100, checkpoint
             )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
@@ -159,7 +165,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -170,6 +176,9 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER with temperature scaling: {:.2f}% for {}.\n".format(
                 post_ts_eer * 100, checkpoint
             )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
@@ -211,7 +220,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -222,6 +231,9 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER with temperature scaling: {:.2f}% for {}.\n".format(
                 post_ts_eer * 100, checkpoint
             )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
@@ -264,7 +276,7 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -275,6 +287,9 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
             "EER with temperature scaling: {:.2f}% for {}.\n".format(
                 post_ts_eer * 100, checkpoint
             )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
@@ -322,7 +337,7 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -334,6 +349,9 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
         #         post_ts_eer * 100, checkpoint
         #     )
         # )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
+        )
         f.close()
 
 
@@ -378,7 +396,7 @@ def test_InTheWild(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.\n"
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
@@ -390,18 +408,17 @@ def test_InTheWild(Net, test_out_file, config, checkpoint, device):
         #         post_ts_eer * 100, checkpoint
         #     )
         # )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
+        )
         f.close()
 
 
 def test(config, checkpoint, dataset="all"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     os.makedirs("/".join(checkpoint.split("/")[:-2]) + "/tests/", exist_ok=True)
-    test_out_file = (
-        "/".join(checkpoint.split("/")[:-2])
-        + "/tests/"
-        + checkpoint.split("/")[-1].split(".")[0]
-        + ".txt"
-    )
+    test_file = ".".join(checkpoint.split("/")[-1].split(".")[:-1]) + ".txt"
+    test_out_file = "/".join(checkpoint.split("/")[:-2]) + "/tests/" + test_file
 
     Net = get_model(config).to(device)
 
