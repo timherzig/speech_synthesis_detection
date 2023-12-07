@@ -19,20 +19,22 @@ def test_dataloader_batch_dimension():
     Test if the dataloader is returning the correct batch dimension
     """
 
+    # get CUDA device if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     config = OmegaConf.load(DEFAULT_CONFIG)
 
     for entry in DATASETS:
-        dataloader = get_dataloaders(config, entry["name"], entry["root"])
+        config.data.data_type = "time_frame"
+        _, _, dataloader, _ = get_dataloaders(config, device)
 
         for batch in dataloader:
-            # Correct batch dimensions
-            if config.data.data_type == "time_frame":
-                assert batch[0].shape == torch.Size(
-                    [config.data.batch_size, 1, 6 * 16000]
-                )
-            elif config.data.data_type == "CQT":
-                assert batch[0].shape == torch.Size(
-                    [config.data.batch_size, 1, 432, 400]
-                )
+            assert batch[0].shape == torch.Size([config.batch_size, 1, 6 * 16000])
+            break
 
+        config.data.data_type = "CQT"
+        _, _, dataloader, _ = get_dataloaders(config, device)
+
+        for batch in dataloader:
+            assert batch[0].shape == torch.Size([config.batch_size, 1, 432, 400])
             break
