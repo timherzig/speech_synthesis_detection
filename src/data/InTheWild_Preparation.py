@@ -6,10 +6,11 @@ import pandas as pd
 import soundfile as sf
 from scipy import signal
 from argparse import ArgumentParser
+from tqdm import tqdm
 
 
 def gen_time_frame(
-    protocol_path, read_audio_path, write_audio_path, duration, status: str
+    protocol_path, read_audio_path, write_audio_path, duration, status: str, sr=16000
 ):
     sub_path = os.path.join(write_audio_path, status + "_" + str(duration))
     if not os.path.exists(sub_path):
@@ -20,8 +21,11 @@ def gen_time_frame(
     num_files = len(protocol.index)
     total_sample_count = 0
 
-    for i in range(num_files):
+    for i in tqdm(range(num_files)):
         x, fs = sf.read(os.path.join(read_audio_path, file_index[i]))
+        if sr != fs:
+            x = librosa.resample(x, fs, sr)
+            fs = sr
         if len(x) < duration * fs:
             x = np.tile(x, int((duration * fs) // len(x)) + 1)
         x = x[0 : (int(duration * fs))]
@@ -34,7 +38,9 @@ def gen_time_frame(
     )
 
 
-def gen_cqt(protocol_path, read_audio_path, write_audio_path, duration, status: str):
+def gen_cqt(
+    protocol_path, read_audio_path, write_audio_path, duration, status: str, sr=16000
+):
     sub_path = os.path.join(write_audio_path, status + "_" + str(duration) + "_cqt")
     if not os.path.exists(sub_path):
         os.makedirs(sub_path)
@@ -45,8 +51,11 @@ def gen_cqt(protocol_path, read_audio_path, write_audio_path, duration, status: 
     total_sample_count = 0
     fs = 16000
 
-    for i in range(num_files):
+    for i in tqdm(range(num_files)):
         x, fs = sf.read(os.path.join(read_audio_path, file_index[i]))
+        if sr != fs:
+            x = librosa.resample(x, fs, sr)
+            fs = sr
         len_sample = int(duration * fs)
 
         if len(x) < len_sample:
