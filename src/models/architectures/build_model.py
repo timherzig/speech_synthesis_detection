@@ -69,11 +69,11 @@ class last_layers(nn.Module):
         elif config.model.activation == "am_softmax":
             self.activation = AMSoftmax(
                 num_classes=config.model.out.out_features,
-                enc_dim=config.model.fc2.out_features,
+                enc_dim=config.model.out.out_features,
             )
         elif config.model.activation == "oc_softmax":
             self.activation = OCSoftmax(
-                feat_dim=config.model.fc2.out_features,
+                feat_dim=config.model.out.out_features,
             )
         else:  # default
             self.activation = nn.Softmax(dim=1)
@@ -84,10 +84,10 @@ class last_layers(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.out(x)
 
-        if self.activation_type != ("am_softmax" or "oc_softmax"):
-            return (self.activation(x), labels)
-        else:
+        if self.activation_type == "am_softmax" or "oc_softmax":
             return (self.activation(x, labels), labels)
+        else:
+            return (self.activation(x), labels)
 
 
 class build_model(nn.Module):

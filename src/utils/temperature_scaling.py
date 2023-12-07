@@ -50,7 +50,7 @@ class ModelWithTemperature(nn.Module):
         with torch.no_grad():
             for input, label, _ in valid_loader:
                 input = input.cuda()
-                logits = self.model(input)
+                logits, _ = self.model((input, label))
                 logits_list.append(logits)
                 labels_list.append(label)
             logits = torch.cat(logits_list).cuda()

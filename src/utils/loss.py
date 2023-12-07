@@ -29,6 +29,9 @@ class OCSoftmax(nn.Module):
         w = F.normalize(self.center, p=2, dim=1)
         x = F.normalize(x, p=2, dim=1)
 
+        print(f"x.shape: {x.shape}")
+        print(f"w transpose shape: {w.transpose(0, 1).shape}")
+
         scores = x @ w.transpose(0, 1)
         output_scores = scores.clone()
 
@@ -37,7 +40,8 @@ class OCSoftmax(nn.Module):
 
         loss = self.softplus(self.alpha * scores).mean()
 
-        return loss, output_scores.squeeze(1)
+        # return loss , output_scores.squeeze(1)
+        return output_scores.squeeze(1)
 
 
 class AMSoftmax(nn.Module):
@@ -64,4 +68,4 @@ class AMSoftmax(nn.Module):
         y_onehot.scatter_(1, torch.unsqueeze(label, dim=-1), self.m)
         margin_logits = self.s * (logits - y_onehot)
 
-        return logits, margin_logits
+        return logits  # , margin_logits

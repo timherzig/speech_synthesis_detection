@@ -110,7 +110,6 @@ def train(config, config_name):
             else:
                 preds, _ = Net((samples, labels))
                 loss = F.cross_entropy(preds, labels, weight=class_weights)
-                # loss = F.cross_entropy(preds, labels)
 
             # backward
             loss.backward()
