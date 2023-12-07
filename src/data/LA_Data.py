@@ -68,6 +68,9 @@ class PrepASV19Dataset(Dataset):
             label = label_encode(label)
             sub_class = self.train_protocol.iloc[index, 3]
             sub_class = sub_class_encode_19(sub_class)
+            print(
+                f"sample shape: {sample.shape}, label: {label}, sub_class: {sub_class}"
+            )
             return sample, label, sub_class
 
         if self.data_type == "CQT":
@@ -78,6 +81,9 @@ class PrepASV19Dataset(Dataset):
             label = label_encode(label)
             sub_class = self.train_protocol.iloc[index, 3]
             sub_class = sub_class_encode_19(sub_class)
+            print(
+                f"sample shape: {sample.shape}, label: {label}, sub_class: {sub_class}"
+            )
             return sample, label, sub_class
 
     def get_weights(self):
