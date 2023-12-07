@@ -16,13 +16,13 @@ class FakeOrRealDataset(Dataset):
         return len(self.protocol.index)
 
     def __getitem__(self, index):
-        data_file_path = os.path.join(self.data_path, self.protocol.iloc[index, "file"])
+        data_file_path = os.path.join(self.data_path, self.protocol.iloc[index, 0])
 
         if self.data_type == "time_frame":
             sample, _ = sf.read(data_file_path)
             sample = torch.tensor(sample, dtype=torch.float32)
             sample = torch.unsqueeze(sample, 0)
-            label = self.protocol.iloc[index, "label"]
+            label = self.protocol.iloc[index, 1]
             label = label_encode(label)
             sub_class = -1
             return sample, label, sub_class
@@ -31,13 +31,13 @@ class FakeOrRealDataset(Dataset):
             sample = torch.load(data_file_path)
             sample = torch.tensor(sample, dtype=torch.float32)
             sample = torch.unsqueeze(sample, 0)
-            label = self.protocol.iloc[index, "label"]
+            label = self.protocol.iloc[index, 1]
             label = label_encode(label)
             sub_class = -1
             return sample, label, sub_class
 
     def get_weights(self):
-        label_info = self.protocol.iloc[:, "label"]
+        label_info = self.protocol.iloc[:, 1]
         num_zero_class = (label_info == "bonafide").sum()
         num_one_class = (label_info == "spoof").sum()
         weights = torch.tensor([num_one_class, num_zero_class], dtype=torch.float32)
