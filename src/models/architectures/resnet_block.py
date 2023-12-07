@@ -147,6 +147,7 @@ class resnet(nn.Module):
             raise NotImplementedError
 
     def forward(self, x):
+        x, labels = x
         for idx, layer in enumerate(self.layers):
             x = layer(x)
             if self.config.model.dim == 1:
@@ -162,4 +163,4 @@ class resnet(nn.Module):
         elif self.config.model.dim == 2:
             x = F.avg_pool2d(x, kernel_size=self.last_avg_pool_ks)
 
-        return torch.flatten(x, start_dim=1)
+        return (torch.flatten(x, start_dim=1), labels)

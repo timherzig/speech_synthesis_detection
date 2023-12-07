@@ -20,7 +20,7 @@ def asv_cal_accuracies(net, device, data_loader):
             num_files += len(label)
             sample = sample.to(device)
             label = label.to(device)
-            infer = net(sample)
+            infer, _ = net((sample, label))
 
             # obtain output probabilities
             t1 = F.softmax(infer, dim=1)

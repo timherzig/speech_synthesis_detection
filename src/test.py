@@ -8,8 +8,8 @@ from src.models.model import get_model
 
 LA_19_ROOT = "/ds/audio/LA_19/"
 LA_21_ROOT = "/ds/audio/LA_21/"
-FakeOrReal_ROOT = "/ds/audio/FakeOrReal/"
-InTheWild_ROOT = "/ds/audio/InTheWild/"
+FAKEORREAL_ROOT = "/ds/audio/FakeOrReal/"
+INTHEWILD_ROOT = "/ds/audio/InTheWild/"
 
 
 def test_all_datasets(Net, test_out_file, config, checkpoint, device):
@@ -128,7 +128,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         f.close()
 
     # Test FakeOrReal
-    config.data.root_dir = FakeOrReal_ROOT
+    config.data.root_dir = FAKEORREAL_ROOT
     config.data.version = "FakeOrReal"
     print(f"---------FakeOrReal---------")
 
@@ -183,7 +183,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         f.close()
 
     # Test InTheWild
-    config.data.root_dir = InTheWild_ROOT
+    config.data.root_dir = INTHEWILD_ROOT
     config.data.version = "InTheWild"
     print(f"---------InTheWild---------")
 
@@ -298,7 +298,7 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
 
 def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
     # Test FakeOrReal
-    config.data.root_dir = FakeOrReal_ROOT
+    config.data.root_dir = FAKEORREAL_ROOT
     config.data.version = "FakeOrReal"
     print(f"---------FakeOrReal---------")
 
@@ -357,7 +357,7 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
 
 def test_InTheWild(Net, test_out_file, config, checkpoint, device):
     # Test InTheWild
-    config.data.root_dir = InTheWild_ROOT
+    config.data.root_dir = INTHEWILD_ROOT
     config.data.version = "InTheWild"
     print(f"---------InTheWild---------")
 

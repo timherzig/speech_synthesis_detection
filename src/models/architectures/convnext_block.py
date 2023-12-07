@@ -26,5 +26,6 @@ class convnext(nn.Module):
         )
 
     def forward(self, x):
+        x, labels = x
         x = x.expand(-1, 3, -1, -1)
-        return self.model(x)
+        return (self.model(x), labels)

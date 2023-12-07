@@ -102,13 +102,13 @@ def train(config, config_name):
                 lam = torch.tensor(lam, requires_grad=False)
                 index = torch.randperm(len(labels))
                 samples = lam * samples + (1 - lam) * samples[index, :]
-                preds = Net(samples)
+                preds, _ = Net((samples, labels))
                 labels_b = labels[index]
                 loss = lam * F.cross_entropy(preds, labels) + (
                     1 - lam
                 ) * F.cross_entropy(preds, labels_b)
             else:
-                preds = Net(samples)
+                preds, _ = Net((samples, labels))
                 loss = F.cross_entropy(preds, labels, weight=class_weights)
                 # loss = F.cross_entropy(preds, labels)
 

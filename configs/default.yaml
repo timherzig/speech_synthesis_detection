@@ -1,7 +1,7 @@
 data:
   root_dir: '/ds/audio/LA_19/'
   version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
-  data_type: 'CQT' # 'time_frame' or 'CQT'
+  data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.5
 
 model:
@@ -31,7 +31,7 @@ model:
   fc1: {'in_features': 128, 'out_features': 64}
   fc2: {'in_features': 64, 'out_features': 32}
   out: {'in_features': 32, 'out_features': 2}
-  activation: 'softmax'
+  activation: 'am_softmax'
 
 batch_size: 32
 num_workers: 8

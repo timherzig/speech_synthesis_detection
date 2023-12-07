@@ -38,6 +38,7 @@ class convnextv2(nn.Module):
         self.activation = nn.Softmax(dim=1)
 
     def forward(self, x):
+        x, labels = x
         bs, c, h, w = x.shape
         x = x.view(x.size(0), -1)
         x -= x.min(1, keepdim=True)[0]
@@ -53,4 +54,4 @@ class convnextv2(nn.Module):
         x = self.fc2(x)
         x = self.out(x)
         x = self.activation(x)
-        return x
+        return (x, labels)
