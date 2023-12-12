@@ -108,6 +108,8 @@ def train(config, config_name):
                     1 - lam
                 ) * F.cross_entropy(preds, labels_b)
             else:
+                if config.model.activation.lower() == "oc_softmax":
+                    raise NotImplementedError
                 preds, _ = Net((samples, labels))
                 loss = F.cross_entropy(preds, labels, weight=class_weights)
 
