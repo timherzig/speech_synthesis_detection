@@ -1,7 +1,7 @@
 import os
 import torch
 
-from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
+from src.utils.metrics import asv_cal_accuracies, cal_roc_eer, cal_roc_eer_sub_class
 from src.utils.temperature_scaling import ModelWithTemperature
 from src.data.data import get_dataloaders
 from src.models.model import get_model
@@ -21,13 +21,14 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, dev_loader, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
     )
 
     pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
 
     print(
         "EER without temperature scaling: {:.2f}% for {}.".format(
@@ -39,7 +40,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     Net_ts = ModelWithTemperature(Net)
     Net_ts.set_temperature(dev_loader)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net_ts,
         device=device,
         data_loader=eval_loader,
@@ -80,7 +81,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -94,7 +95,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net_ts,
         device=device,
         data_loader=eval_loader,
@@ -135,7 +136,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -149,7 +150,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net_ts,
         device=device,
         data_loader=eval_loader,
@@ -190,7 +191,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -204,7 +205,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net_ts,
         device=device,
         data_loader=eval_loader,
@@ -242,7 +243,7 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, dev_loader, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -260,7 +261,7 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
     Net = ModelWithTemperature(Net)
     Net.set_temperature(dev_loader)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -305,7 +306,7 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,
@@ -364,7 +365,7 @@ def test_InTheWild(Net, test_out_file, config, checkpoint, device):
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
 
-    accuracy, probabilities = asv_cal_accuracies(
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
         device=device,
         data_loader=eval_loader,

@@ -24,7 +24,7 @@ class FakeOrRealDataset(Dataset):
             sample = torch.unsqueeze(sample, 0)
             label = self.protocol.iloc[index, 1]
             label = label_encode(label)
-            sub_class = -1
+            sub_class = torch.tensor(-1, dtype=torch.int64)
             return sample, label, sub_class
 
         if self.data_type == "CQT":
@@ -33,7 +33,7 @@ class FakeOrRealDataset(Dataset):
             sample = torch.unsqueeze(sample, 0)
             label = self.protocol.iloc[index, 1]
             label = label_encode(label)
-            sub_class = -1
+            sub_class = torch.tensor(-1, dtype=torch.int64)
             return sample, label, sub_class
 
     def get_weights(self):

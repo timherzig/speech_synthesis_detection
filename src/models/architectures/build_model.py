@@ -84,7 +84,7 @@ class last_layers(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.out(x)
 
-        if self.activation_type == "am_softmax" or "oc_softmax":
+        if self.activation_type == "am_softmax" or self.activation_type == "oc_softmax":
             return (self.activation(x, labels), labels)
         else:
             return (self.activation(x), labels)

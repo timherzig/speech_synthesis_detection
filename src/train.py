@@ -56,7 +56,7 @@ def train(config, config_name):
     time_name = time_name.replace(" ", "_")
     time_name = time_name.replace(":", "_")
 
-    path = "./trained_models/LA_{}/{}/{}".format(
+    path = "./trained_models/{}/{}/{}".format(
         config.data.version, config.model.architecture, config_name
     )
 
@@ -125,8 +125,8 @@ def train(config, config_name):
             device=device,
             data_loader=dev_loader,
         )
-
         d_eer = cal_roc_eer(d_probs, show_plot=False)
+
         e_eer = 0.99
         eval_accuracy = 0.00
         if d_eer <= best_d_eer[0]:
@@ -204,4 +204,4 @@ def train(config, config_name):
     print("End of training.")
     print("Best model saved at: {}".format(best_model_save_path))
 
-    test(config, best_model_save_path)
+    test(config, best_model_save_path, "all")
