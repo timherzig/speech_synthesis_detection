@@ -240,6 +240,11 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
 
 
 def test_LA(Net, test_out_file, config, checkpoint, device):
+    # Test LA_19
+    config.data.root_dir = LA_19_ROOT
+    config.data.version = "LA_19"
+    print(f"---------LA_19---------")
+
     # Get dataloaders
     _, dev_loader, eval_loader, _ = get_dataloaders(config, device)
 
@@ -250,6 +255,7 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
     )
 
     pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
 
     print(
         "EER without temperature scaling: {:.2f}% for {}.".format(
@@ -258,8 +264,50 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
     )
 
     # Temperature scaling
-    Net = ModelWithTemperature(Net)
-    Net.set_temperature(dev_loader)
+    Net_ts = ModelWithTemperature(Net)
+    Net_ts.set_temperature(dev_loader)
+
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
+        net=Net_ts,
+        device=device,
+        data_loader=eval_loader,
+    )
+
+    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
+
+    print(
+        "EER with temperature scaling: {:.2f}% for {}.".format(
+            post_ts_eer * 100, checkpoint
+        )
+    )
+
+    with open(test_out_file, "a") as f:
+        f.write(
+            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+        )
+        f.write(
+            "EER without temperature scaling: {:.2f}% for {}.\n".format(
+                pre_ts_eer * 100, checkpoint
+            )
+        )
+        f.write(
+            "EER with temperature scaling: {:.2f}% for {}.\n".format(
+                post_ts_eer * 100, checkpoint
+            )
+        )
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
+        )
+        f.close()
+
+    # Test LA_21
+    config.data.root_dir = LA_21_ROOT
+    config.data.version = "LA_21"
+    print(f"---------LA_21---------")
+
+    # Get dataloaders
+    _, _, eval_loader, _ = get_dataloaders(config, device)
 
     accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
@@ -267,7 +315,23 @@ def test_LA(Net, test_out_file, config, checkpoint, device):
         data_loader=eval_loader,
     )
 
+    pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
+
+    print(
+        "EER without temperature scaling: {:.2f}% for {}.".format(
+            pre_ts_eer * 100, checkpoint
+        )
+    )
+
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
+        net=Net_ts,
+        device=device,
+        data_loader=eval_loader,
+    )
+
     post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
 
     print(
         "EER with temperature scaling: {:.2f}% for {}.".format(

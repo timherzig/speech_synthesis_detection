@@ -64,8 +64,14 @@ def cal_roc_eer(probs, show_plot=True):
     )
     cnt = 0
     for i in threshold_index:
-        tpr[cnt] = one_probs.le(i).sum().item() / len(one_probs)
-        fpr[cnt] = zero_probs.le(i).sum().item() / len(zero_probs)
+        tpr[cnt] = (
+            one_probs.le(i).sum().item() / len(one_probs) if len(one_probs) > 0 else 0
+        )
+        fpr[cnt] = (
+            zero_probs.le(i).sum().item() / len(zero_probs)
+            if len(zero_probs) > 0
+            else 0
+        )
         cnt += 1
 
     sum_rate = tpr + fpr
@@ -102,17 +108,14 @@ def cal_roc_eer(probs, show_plot=True):
 def cal_roc_eer_sub_class(probs, sub_classes, show_plot=True):
     assert probs.shape[0] == sub_classes.shape[0], "Number of samples not equal."
 
-    print(f"Probs Shape: {probs.shape}")
-    print(f"Probs: {probs}")
-
-    for sub_class in torch.unique(sub_classes, return_inverse=True):
-        print(f"Sub class: {sub_class}")
-        print(f"Sub classes: {sub_classes}")
-        sub_class_index = torch.nonzero((sub_classes == sub_class)).squeeze(-1)
-        print("Number of Samples: ", len(sub_class_index))
-        print(sub_class_index)
-        sub_class_probs = probs[sub_class_index, :]
-        print(sub_class_probs)
-        print(f"Sub Class Probs Shape: {sub_class_probs.shape}")
+    for sub_class in torch.unique(sub_classes):
+        if sub_class == 0.0 or sub_class == -1.0:
+            print("Skipping sub class 0")
+            continue
+        sub_class_index = torch.nonzero(sub_classes == sub_class).squeeze(-1)
+        zero_class_index = torch.nonzero(sub_classes == 0.0).squeeze(-1)
+        neg_class_index = torch.nonzero(sub_classes == -1.0).squeeze(-1)
+        index = torch.cat((sub_class_index, zero_class_index, neg_class_index), dim=0)
+        sub_class_probs = probs[index, :]
         eer = cal_roc_eer(sub_class_probs, show_plot=show_plot)
-        print("Sub Class EER: ", eer)
+        print(f"Sub Class {sub_class} EER: {eer*100:.4f}")
