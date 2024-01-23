@@ -18,6 +18,7 @@ class res2next(nn.Module):
         )
 
     def forward(self, x):
+        x, labels = x
         x = x.unsqueeze(2)
         x = x.repeat(1, 1, 3, 1)
-        return self.model(x)
+        return (self.model(x), labels)

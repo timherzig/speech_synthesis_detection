@@ -7,6 +7,9 @@ from src.models.architectures.convnextv2_block import convnextv2
 from src.models.architectures.resnet_block import resnet
 from src.models.architectures.inception_block import inception
 from src.models.architectures.wav2vec2_block import wav2vec2
+from src.models.architectures.aasist_block import aasist
+
+from src.utils.loss import AMSoftmax, OCSoftmax
 
 
 class first_layer(nn.Module):
@@ -36,14 +39,16 @@ class first_layer(nn.Module):
             raise NotImplementedError
 
     def forward(self, x):
+        x, labels = x
         x = self.shared_block_1_conv(x)
         x = self.shared_block_1_bn(x)
-        return x
+        return (x, labels)
 
 
 class last_layers(nn.Module):
     def __init__(self, config):
         super().__init__()
+        self.activation_type = config.model.activation
 
         self.fc1 = nn.Linear(
             in_features=config.model.fc1.in_features,
@@ -62,15 +67,28 @@ class last_layers(nn.Module):
             self.activation = nn.Softmax(dim=1)
         elif config.model.activation == "logsoftmax":
             self.activation = nn.LogSoftmax(dim=1)
+        elif config.model.activation == "am_softmax":
+            self.activation = AMSoftmax(
+                num_classes=config.model.out.out_features,
+                enc_dim=config.model.out.out_features,
+            )
+        elif config.model.activation == "oc_softmax":
+            self.activation = OCSoftmax(
+                feat_dim=config.model.out.out_features,
+            )
         else:  # default
             self.activation = nn.Softmax(dim=1)
 
     def forward(self, x):
+        x, labels = x
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.out(x)
 
-        return self.activation(x)
+        if self.activation_type == "am_softmax" or self.activation_type == "oc_softmax":
+            return (self.activation(x, labels), labels)
+        else:
+            return (self.activation(x), labels)
 
 
 class build_model(nn.Module):
@@ -94,6 +112,8 @@ class build_model(nn.Module):
         #     self.layers.append(convnext(self.config))
         elif self.config.model.architecture == "wav2vec2":
             self.layers.append(wav2vec2(self.config))
+        elif self.config.model.architecture == "aasist":
+            self.layers.append(aasist(self.config))
         else:
             raise NotImplementedError
 
@@ -103,4 +123,5 @@ class build_model(nn.Module):
         self.model = nn.Sequential(*self.layers)
 
     def forward(self, x):
-        return self.model(x)
+        x, labels = x
+        return self.model((x, labels))

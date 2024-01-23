@@ -71,6 +71,7 @@ class inception(nn.Module):
             raise NotImplementedError
 
     def forward(self, x):
+        x, labels = x
         for idx, layer in enumerate(self.layers):
             x = layer(x)
             if self.config.model.dim == 1:
@@ -78,4 +79,4 @@ class inception(nn.Module):
             elif self.config.model.dim == 2:
                 x = F.max_pool2d(x, kernel_size=self.max_pool_ks[idx])
 
-        return torch.flatten(x, start_dim=1)
+        return (torch.flatten(x, start_dim=1), labels)

@@ -12,6 +12,7 @@ def asv_cal_accuracies(net, device, data_loader):
         softmax_acc = 0
         num_files = 0
         probs = torch.empty(0, 3).to(device)
+        sub_classes = torch.empty(0).to(device)
 
         for batch in data_loader:
             # load batch and infer
@@ -20,13 +21,16 @@ def asv_cal_accuracies(net, device, data_loader):
             num_files += len(label)
             sample = sample.to(device)
             label = label.to(device)
-            infer = net(sample)
+            sub_class = sub_class.to(device)
+            zeroes_label = torch.zeros_like(label).to(device)
+            infer, _ = net((sample, zeroes_label))
 
             # obtain output probabilities
             t1 = F.softmax(infer, dim=1)
             t2 = label.unsqueeze(-1)
             row = torch.cat((t1, t2), dim=1)
             probs = torch.cat((probs, row), dim=0)
+            sub_classes = torch.cat((sub_classes, sub_class), dim=0)
 
             # calculate example level accuracy
             infer = infer.argmax(dim=1)
@@ -35,7 +39,7 @@ def asv_cal_accuracies(net, device, data_loader):
 
         softmax_acc = softmax_acc / num_files
 
-    return softmax_acc, probs.to("cpu")
+    return softmax_acc, probs.to(device), sub_classes.to(device)
 
 
 def cal_roc_eer(probs, show_plot=True):
@@ -60,8 +64,15 @@ def cal_roc_eer(probs, show_plot=True):
     )
     cnt = 0
     for i in threshold_index:
-        tpr[cnt] = one_probs.le(i).sum().item() / len(one_probs)
-        fpr[cnt] = zero_probs.le(i).sum().item() / len(zero_probs)
+        # TODO: Ask Arbnab about this, what to do if there are no samples for respective class (zero division)
+        tpr[cnt] = (
+            one_probs.le(i).sum().item() / len(one_probs) if len(one_probs) > 0 else 0
+        )
+        fpr[cnt] = (
+            zero_probs.le(i).sum().item() / len(zero_probs)
+            if len(zero_probs) > 0
+            else 0
+        )
         cnt += 1
 
     sum_rate = tpr + fpr
@@ -93,3 +104,19 @@ def cal_roc_eer(probs, show_plot=True):
         plt.show()
 
     return out_eer
+
+
+def cal_roc_eer_sub_class(probs, sub_classes, show_plot=True):
+    assert probs.shape[0] == sub_classes.shape[0], "Number of samples not equal."
+
+    for sub_class in torch.unique(sub_classes):
+        if sub_class == 0.0 or sub_class == -1.0:
+            print("Skipping sub class 0")
+            continue
+        sub_class_index = torch.nonzero(sub_classes == sub_class).squeeze(-1)
+        zero_class_index = torch.nonzero(sub_classes == 0.0).squeeze(-1)
+        neg_class_index = torch.nonzero(sub_classes == -1.0).squeeze(-1)
+        index = torch.cat((sub_class_index, zero_class_index, neg_class_index), dim=0)
+        sub_class_probs = probs[index, :]
+        eer = cal_roc_eer(sub_class_probs, show_plot=show_plot)
+        print(f"Sub Class {sub_class} EER: {eer*100:.4f}")

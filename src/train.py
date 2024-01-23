@@ -56,7 +56,7 @@ def train(config, config_name):
     time_name = time_name.replace(" ", "_")
     time_name = time_name.replace(":", "_")
 
-    path = "./trained_models/LA_{}/{}/{}".format(
+    path = "./trained_models/{}/{}/{}".format(
         config.data.version, config.model.architecture, config_name
     )
 
@@ -102,37 +102,39 @@ def train(config, config_name):
                 lam = torch.tensor(lam, requires_grad=False)
                 index = torch.randperm(len(labels))
                 samples = lam * samples + (1 - lam) * samples[index, :]
-                preds = Net(samples)
+                preds, _ = Net((samples, labels))
                 labels_b = labels[index]
                 loss = lam * F.cross_entropy(preds, labels) + (
                     1 - lam
                 ) * F.cross_entropy(preds, labels_b)
             else:
-                preds = Net(samples)
+                if config.model.activation.lower() == "oc_softmax":
+                    raise NotImplementedError
+                preds, _ = Net((samples, labels))
                 loss = F.cross_entropy(preds, labels, weight=class_weights)
-                # loss = F.cross_entropy(preds, labels)
 
             # backward
             loss.backward()
-            optimizer.step()
+            optimizer.step()  # update weights
             total_loss += loss.item()
 
         loss_per_epoch[epoch] = total_loss / counter
+        scheduler.step()  # update lr
 
-        dev_accuracy, d_probs = asv_cal_accuracies(
+        dev_accuracy, d_probs, _ = asv_cal_accuracies(
             net=Net,
             device=device,
             data_loader=dev_loader,
         )
-
         d_eer = cal_roc_eer(d_probs, show_plot=False)
+
         e_eer = 0.99
         eval_accuracy = 0.00
         if d_eer <= best_d_eer[0]:
             best_d_eer[0] = d_eer
             best_d_eer[1] = int(epoch)
 
-            eval_accuracy, e_probs = asv_cal_accuracies(
+            eval_accuracy, e_probs, _ = asv_cal_accuracies(
                 net=Net,
                 device=device,
                 data_loader=eval_loader,
@@ -203,4 +205,4 @@ def train(config, config_name):
     print("End of training.")
     print("Best model saved at: {}".format(best_model_save_path))
 
-    test(config, best_model_save_path)
+    test(config, best_model_save_path, "all")

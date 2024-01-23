@@ -23,9 +23,8 @@ class PrepASV21Dataset(Dataset):
             sample = torch.unsqueeze(sample, 0)
             label = self.train_protocol.iloc[index, 5]
             label = label_encode(label)
-            sub_class = -1  # currently not used
-            # sub_class = self.train_protocol.iloc[index, 4]
-            # sub_class = sub_class_encode_19(sub_class)
+            sub_class = self.train_protocol.iloc[index, 4]
+            sub_class = sub_class_encode_19(sub_class)
             return sample, label, sub_class
 
         if self.data_type == "CQT":
@@ -34,9 +33,8 @@ class PrepASV21Dataset(Dataset):
             sample = torch.unsqueeze(sample, 0)
             label = self.train_protocol.iloc[index, 5]
             label = label_encode(label)
-            sub_class = -1  # currently not used
-            # sub_class = self.train_protocol.iloc[index, 4]
-            # sub_class = sub_class_encode_19(sub_class)
+            sub_class = self.train_protocol.iloc[index, 4]
+            sub_class = sub_class_encode_19(sub_class)
             return sample, label, sub_class
 
     def get_weights(self):
@@ -181,6 +179,16 @@ def sub_class_encode_19(label):
         label = torch.tensor(18, dtype=torch.int64)
     elif label == "A19":
         label = torch.tensor(19, dtype=torch.int64)
+    elif label == "sin_tx":
+        label = torch.tensor(20, dtype=torch.int64)
+    elif label == "mad_tx":
+        label = torch.tensor(21, dtype=torch.int64)
+    elif label == "loc_tx":
+        label = torch.tensor(22, dtype=torch.int64)
+    elif label == "ita_tx":
+        label = torch.tensor(23, dtype=torch.int64)
+    else:
+        label = torch.tensor(-1, dtype=torch.int64)
     return label
 
 

@@ -33,10 +33,11 @@ class wav2vec2(nn.Module):
         self.out = nn.Linear(in_features=int(out_shape / 256), out_features=2)
 
     def forward(self, x):
+        x, labels = x
         x = torch.squeeze(x, 1)
         outputs = self.model(input_values=x)
         x = self.rnn(outputs.extract_features)[0][:, -1, :]
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.out(x)
-        return x
+        return (x, labels)
