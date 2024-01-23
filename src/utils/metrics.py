@@ -64,6 +64,7 @@ def cal_roc_eer(probs, show_plot=True):
     )
     cnt = 0
     for i in threshold_index:
+        # TODO: Ask Arbnab about this, what to do if there are no samples for respective class (zero division)
         tpr[cnt] = (
             one_probs.le(i).sum().item() / len(one_probs) if len(one_probs) > 0 else 0
         )

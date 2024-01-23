@@ -115,12 +115,13 @@ def train(config, config_name):
 
             # backward
             loss.backward()
-            optimizer.step()
+            optimizer.step()  # update weights
             total_loss += loss.item()
 
         loss_per_epoch[epoch] = total_loss / counter
+        scheduler.step()  # update lr
 
-        dev_accuracy, d_probs = asv_cal_accuracies(
+        dev_accuracy, d_probs, _ = asv_cal_accuracies(
             net=Net,
             device=device,
             data_loader=dev_loader,
@@ -133,7 +134,7 @@ def train(config, config_name):
             best_d_eer[0] = d_eer
             best_d_eer[1] = int(epoch)
 
-            eval_accuracy, e_probs = asv_cal_accuracies(
+            eval_accuracy, e_probs, _ = asv_cal_accuracies(
                 net=Net,
                 device=device,
                 data_loader=eval_loader,

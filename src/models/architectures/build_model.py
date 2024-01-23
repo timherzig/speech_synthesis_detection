@@ -7,6 +7,7 @@ from src.models.architectures.convnextv2_block import convnextv2
 from src.models.architectures.resnet_block import resnet
 from src.models.architectures.inception_block import inception
 from src.models.architectures.wav2vec2_block import wav2vec2
+from src.models.architectures.aasist_block import aasist
 
 from src.utils.loss import AMSoftmax, OCSoftmax
 
@@ -111,6 +112,8 @@ class build_model(nn.Module):
         #     self.layers.append(convnext(self.config))
         elif self.config.model.architecture == "wav2vec2":
             self.layers.append(wav2vec2(self.config))
+        elif self.config.model.architecture == "aasist":
+            self.layers.append(aasist(self.config))
         else:
             raise NotImplementedError
 
