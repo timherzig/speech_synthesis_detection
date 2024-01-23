@@ -1,3 +1,5 @@
+# This is the default config file. You can create your own config file and pass it to the train.py script. Used for debugging purposes and as a template for creating new config files.
+
 data:
   root_dir: '/ds/audio/LA_19/'
   version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal

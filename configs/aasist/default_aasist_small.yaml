@@ -6,10 +6,10 @@ data:
 
 model:
   architecture: 'aasist'
-  size: 'default'
+  size: 'default_small'
   shared_first_last: False
-  aasist_config: 'src/models/architectures/aasist/config/AASIST.conf'
-  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST.pth' # Null
+  aasist_config: 'src/models/architectures/aasist/config/AASIST-L.conf'
+  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST-L.pth' # Null
   activation: 'softmax'
 
 batch_size: 32
