@@ -1,12 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-# from src.models.architectures.res2next_block import res2next
-# from src.models.architectures.convnext_block import convnext
-from src.models.architectures.convnextv2_block import convnextv2
 from src.models.architectures.resnet_block import resnet
 from src.models.architectures.inception_block import inception
-from src.models.architectures.wav2vec2_block import wav2vec2
 from src.models.architectures.aasist_block import aasist
 
 from src.utils.loss import AMSoftmax, OCSoftmax
@@ -104,14 +100,6 @@ class build_model(nn.Module):
             self.layers.append(resnet(self.config))
         elif self.config.model.architecture == "inception":
             self.layers.append(inception(self.config))
-        # elif self.config.model.architecture == "res2next":
-        #     self.layers.append(res2next(self.config))
-        elif self.config.model.architecture == "convnextv2":
-            self.layers.append(convnextv2(self.config))
-        # elif self.config.model.architecture == "convnext":
-        #     self.layers.append(convnext(self.config))
-        elif self.config.model.architecture == "wav2vec2":
-            self.layers.append(wav2vec2(self.config))
         elif self.config.model.architecture == "aasist":
             self.layers.append(aasist(self.config))
         else:
