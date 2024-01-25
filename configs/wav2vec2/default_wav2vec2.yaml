@@ -1,0 +1,18 @@
+data:
+  root_dir: '/ds/audio/LA_19/'
+  version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
+  data_type: 'time_frame' # 'time_frame' or 'CQT'
+  aug_prob: 0.5
+
+model:
+  architecture: 'wav2vec2'
+  size: 'default'
+  shared_first_last: False
+  wav2vec2_pretrained: Null
+  xlsr_pretrained: 'src/models/architectures/wav2vec2/xlsr2_300m.pt'
+  activation: 'softmax'
+
+batch_size: 32
+num_workers: 8
+num_epochs: 2
+lr: 0.001
