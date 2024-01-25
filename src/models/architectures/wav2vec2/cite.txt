@@ -1,0 +1,3 @@
+from this paper: https://arxiv.org/pdf/2202.12233.pdf
+
+github: https://github.com/eurecom-asp/SSL_Anti-spoofing?tab=readme-ov-file
