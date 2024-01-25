@@ -29,7 +29,7 @@ def train(config, config_name):
         config, device
     )
 
-    Net = get_model(config).to(device)
+    Net = get_model(config, device).to(device)
 
     num_total_learnable_params = sum(
         i.numel() for i in Net.parameters() if i.requires_grad
