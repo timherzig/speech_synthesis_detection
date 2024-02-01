@@ -1,8 +1,9 @@
 data:
-  root_dir: '/ds/audio/LA_19/'
-  version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
+  root_dir: ['/ds/audio/LA_19/', '/ds/audio/FakeOrReal/']
+  version: ["LA_19", "FakeOrReal"] # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
+
 model:
   architecture: 'rawgat'
   size: 'default'
@@ -13,5 +14,5 @@ model:
 
 batch_size: 32
 num_workers: 8
-num_epochs: 10
-lr: 0.00001
+num_epochs: 50
+lr: 0.0001

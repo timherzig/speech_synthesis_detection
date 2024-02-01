@@ -1,6 +1,6 @@
 data:
-  root_dir: '/ds/audio/LA_19/'
-  version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
+  root_dir: '/ds/audio/FakeOrReal/'
+  version: "FakeOrReal" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
 model:
@@ -8,10 +8,10 @@ model:
   size: 'default'
   shared_first_last: False
   rawgat_config: 'src/models/architectures/rawgat/model_config_RawGAT_ST.yaml'
-  rawgat_weights: 'src/models/architectures/rawgat/Pre_trained_models/RawGAT_ST_mul/Best_epoch.pth' # Null
+  rawgat_weights: Null # 'src/models/architectures/rawgat/Pre_trained_models/RawGAT_ST_mul/Best_epoch.pth'
   activation: 'softmax'
 
 batch_size: 32
 num_workers: 8
-num_epochs: 10
-lr: 0.00001
+num_epochs: 50
+lr: 0.001
