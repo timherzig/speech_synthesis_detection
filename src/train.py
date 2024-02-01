@@ -59,7 +59,7 @@ def train(config, config_name):
     time_name = time_name.replace(":", "_")
 
     path = "./trained_models/{}/{}/{}".format(
-        config.data.version, config.model.architecture, config_name
+        "".join(config.data.version), config.model.architecture, config_name
     )
 
     if os.path.exists(path):
@@ -149,7 +149,7 @@ def train(config, config_name):
                 + str(epoch)
                 + "_"
                 + "ASVspoof20"
-                + str(config.data.version)
+                + str("".join(config.data.version))
                 + "_LA_Loss_"
                 + str(round(total_loss / counter, 4))
                 + "_dEER_"
