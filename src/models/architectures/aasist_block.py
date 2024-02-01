@@ -24,4 +24,5 @@ class aasist(nn.Module):
     def forward(self, x):
         x, labels = x
         _, x = self.aasist(x)
+        x = torch.flip(x, dims=[1])
         return (x, labels)

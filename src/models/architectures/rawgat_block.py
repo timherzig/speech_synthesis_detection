@@ -24,4 +24,5 @@ class rawgat(nn.Module):
     def forward(self, x):
         x, labels = x
         x = self.rawgat(x)
+        x = torch.flip(x, dims=[1])
         return (x, labels)
