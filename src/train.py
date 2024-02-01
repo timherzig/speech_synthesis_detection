@@ -28,6 +28,7 @@ def train(config, config_name):
     train_loader, dev_loader, eval_loader, class_weights = get_dataloaders(
         config, device
     )
+    print(f"Class weights: {class_weights}")
 
     Net = get_model(config, device).to(device)
 
@@ -38,6 +39,7 @@ def train(config, config_name):
 
     optimizer = optim.Adam(Net.parameters(), lr=config.lr)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+    # scheduler = optim.lr_scheduler.StepLrq(optimizer, step_size=10, gamma=0.75)
     loss_type = "WCE"  # {'WCE', 'mixup'}
 
     print(
