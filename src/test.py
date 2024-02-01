@@ -2,8 +2,10 @@ import os
 import torch
 
 from src.utils.metrics import asv_cal_accuracies, cal_roc_eer, cal_roc_eer_sub_class
-# from src.utils.temperature_scaling import ModelWithTemperature
+
+from src.utils.temperature_scaling import ModelWithTemperature
 from src.data.data import get_dataloaders
+
 # from src.models.model import get_model
 
 LA_19_ROOT = "/ds/audio/LA_19/"
@@ -173,7 +175,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
-        # )
+        )
         # f.write(
         #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
         #         post_ts_eer * 100, checkpoint
@@ -228,7 +230,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
-        # )
+        )
         # f.write(
         #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
         #         post_ts_eer * 100, checkpoint
