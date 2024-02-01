@@ -380,7 +380,7 @@ class RawGAT_ST(nn.Module):
         """
 
         # follow sincNet recipe
-        x = x.squeeze()
+        x = x.squeeze(1)
 
         nb_samp = x.shape[0]
         len_seq = x.shape[1]
