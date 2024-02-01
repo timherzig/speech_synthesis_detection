@@ -6,7 +6,7 @@ from src.utils.metrics import asv_cal_accuracies, cal_roc_eer, cal_roc_eer_sub_c
 from src.utils.temperature_scaling import ModelWithTemperature
 from src.data.data import get_dataloaders
 
-# from src.models.model import get_model
+from src.models.model import get_model
 
 LA_19_ROOT = "/ds/audio/LA_19/"
 LA_21_ROOT = "/ds/audio/LA_21/"
