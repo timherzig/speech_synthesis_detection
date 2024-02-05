@@ -1,6 +1,13 @@
 import argparse
 
 
+def none_or_str(value):
+    print(value)
+    if value == "None":
+        return None
+    return value
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="PyTorch Speech Synthesis Detection")
 
@@ -24,7 +31,8 @@ def parse_args():
     parser.add_argument(
         "--checkpoint",
         default=None,
-        type=str,
+        type=none_or_str,
+        nargs="?",
         help="Path to checkpoint to test",
     )
 

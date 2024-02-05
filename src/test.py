@@ -2,8 +2,10 @@ import os
 import torch
 
 from src.utils.metrics import asv_cal_accuracies, cal_roc_eer, cal_roc_eer_sub_class
+
 from src.utils.temperature_scaling import ModelWithTemperature
 from src.data.data import get_dataloaders
+
 from src.models.model import get_model
 
 LA_19_ROOT = "/ds/audio/LA_19/"
@@ -28,7 +30,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
     )
 
     pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
-    cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
+    sub_class_out = cal_roc_eer_sub_class(probabilities, sub_classes, show_plot=False)
 
     print(
         "EER without temperature scaling: {:.2f}% for {}.".format(
@@ -36,38 +38,39 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    # Temperature scaling
-    Net_ts = ModelWithTemperature(Net)
-    Net_ts.set_temperature(dev_loader)
+    # # Temperature scaling
+    # Net_ts = ModelWithTemperature(Net)
+    # Net_ts.set_temperature(dev_loader)
 
-    accuracy, probabilities, sub_classes = asv_cal_accuracies(
-        net=Net_ts,
-        device=device,
-        data_loader=eval_loader,
-    )
+    # accuracy, probabilities, sub_classes = asv_cal_accuracies(
+    #     net=Net_ts,
+    #     device=device,
+    #     data_loader=eval_loader,
+    # )
 
-    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print(
-        "EER with temperature scaling: {:.2f}% for {}.".format(
-            post_ts_eer * 100, checkpoint
-        )
-    )
+    # print(
+    #     "EER with temperature scaling: {:.2f}% for {}.".format(
+    #         post_ts_eer * 100, checkpoint
+    #     )
+    # )
 
     with open(test_out_file, "w") as f:
         f.write(
-            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
         )
-        f.write(
-            "EER with temperature scaling: {:.2f}% for {}.\n".format(
-                post_ts_eer * 100, checkpoint
-            )
-        )
+        # f.write(
+        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
+        #         post_ts_eer * 100, checkpoint
+        #     )
+        # )
+        f.write(sub_class_out)
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
@@ -95,34 +98,34 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities, sub_classes = asv_cal_accuracies(
-        net=Net_ts,
-        device=device,
-        data_loader=eval_loader,
-    )
+    # accuracy, probabilities, sub_classes = asv_cal_accuracies(
+    #     net=Net_ts,
+    #     device=device,
+    #     data_loader=eval_loader,
+    # )
 
-    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print(
-        "EER with temperature scaling: {:.2f}% for {}.".format(
-            post_ts_eer * 100, checkpoint
-        )
-    )
+    # print(
+    #     "EER with temperature scaling: {:.2f}% for {}.".format(
+    #         post_ts_eer * 100, checkpoint
+    #     )
+    # )
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
         )
-        f.write(
-            "EER with temperature scaling: {:.2f}% for {}.\n".format(
-                post_ts_eer * 100, checkpoint
-            )
-        )
+        # f.write(
+        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
+        #         post_ts_eer * 100, checkpoint
+        #     )
+        # )
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
@@ -150,34 +153,34 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities, sub_classes = asv_cal_accuracies(
-        net=Net_ts,
-        device=device,
-        data_loader=eval_loader,
-    )
+    # accuracy, probabilities, sub_classes = asv_cal_accuracies(
+    #     net=Net_ts,
+    #     device=device,
+    #     data_loader=eval_loader,
+    # )
 
-    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print(
-        "EER with temperature scaling: {:.2f}% for {}.".format(
-            post_ts_eer * 100, checkpoint
-        )
-    )
+    # print(
+    #     "EER with temperature scaling: {:.2f}% for {}.".format(
+    #         post_ts_eer * 100, checkpoint
+    #     )
+    # )
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
         )
-        f.write(
-            "EER with temperature scaling: {:.2f}% for {}.\n".format(
-                post_ts_eer * 100, checkpoint
-            )
-        )
+        # f.write(
+        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
+        #         post_ts_eer * 100, checkpoint
+        #     )
+        # )
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
@@ -205,34 +208,34 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    accuracy, probabilities, sub_classes = asv_cal_accuracies(
-        net=Net_ts,
-        device=device,
-        data_loader=eval_loader,
-    )
+    # accuracy, probabilities, sub_classes = asv_cal_accuracies(
+    #     net=Net_ts,
+    #     device=device,
+    #     data_loader=eval_loader,
+    # )
 
-    post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print(
-        "EER with temperature scaling: {:.2f}% for {}.".format(
-            post_ts_eer * 100, checkpoint
-        )
-    )
+    # print(
+    #     "EER with temperature scaling: {:.2f}% for {}.".format(
+    #         post_ts_eer * 100, checkpoint
+    #     )
+    # )
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
         )
         f.write(
             "EER without temperature scaling: {:.2f}% for {}.\n".format(
                 pre_ts_eer * 100, checkpoint
             )
         )
-        f.write(
-            "EER with temperature scaling: {:.2f}% for {}.\n".format(
-                post_ts_eer * 100, checkpoint
-            )
-        )
+        # f.write(
+        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
+        #         post_ts_eer * 100, checkpoint
+        #     )
+        # )
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
@@ -384,22 +387,6 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    # We do not have a dev set to tune the temperature scaling
-
-    # accuracy, probabilities = asv_cal_accuracies(
-    #     net=Net_ts,
-    #     device=device,
-    #     data_loader=eval_loader,
-    # )
-
-    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
-
-    # print(
-    #     "EER with temperature scaling: {:.2f}% for {}.".format(
-    #         post_ts_eer * 100, checkpoint
-    #     )
-    # )
-
     with open(test_out_file, "a") as f:
         f.write(
             f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
@@ -409,11 +396,6 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
                 pre_ts_eer * 100, checkpoint
             )
         )
-        # f.write(
-        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
-        #         post_ts_eer * 100, checkpoint
-        #     )
-        # )
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
@@ -443,22 +425,6 @@ def test_InTheWild(Net, test_out_file, config, checkpoint, device):
         )
     )
 
-    # We do not have a dev set to tune the temperature scaling
-
-    # accuracy, probabilities = asv_cal_accuracies(
-    #     net=Net_ts,
-    #     device=device,
-    #     data_loader=eval_loader,
-    # )
-
-    # post_ts_eer = cal_roc_eer(probabilities, show_plot=False)
-
-    # print(
-    #     "EER with temperature scaling: {:.2f}% for {}.".format(
-    #         post_ts_eer * 100, checkpoint
-    #     )
-    # )
-
     with open(test_out_file, "a") as f:
         f.write(
             f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
@@ -468,33 +434,36 @@ def test_InTheWild(Net, test_out_file, config, checkpoint, device):
                 pre_ts_eer * 100, checkpoint
             )
         )
-        # f.write(
-        #     "EER with temperature scaling: {:.2f}% for {}.\n".format(
-        #         post_ts_eer * 100, checkpoint
-        #     )
-        # )
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
         f.close()
 
 
-def test(config, checkpoint, dataset="all"):
+def test(config, checkpoint=None, dataset="all", config_name="default"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    os.makedirs("/".join(checkpoint.split("/")[:-2]) + "/tests/", exist_ok=True)
-    test_file = ".".join(checkpoint.split("/")[-1].split(".")[:-1]) + ".txt"
-    test_out_file = "/".join(checkpoint.split("/")[:-2]) + "/tests/" + test_file
-
-    Net = get_model(config).to(device)
+    Net = get_model(config, device).to(device)
 
     num_total_learnable_params = sum(
         i.numel() for i in Net.parameters() if i.requires_grad
     )
-    print("Number of params: {}.".format(num_total_learnable_params))
-    check_point = torch.load(checkpoint)
-    Net.load_state_dict(check_point["model_state_dict"])
 
-    print("Checkpoint loaded...")
+    print("Number of params: {}.".format(num_total_learnable_params))
+    if checkpoint != None:
+        os.makedirs("/".join(checkpoint.split("/")[:-2]) + "/tests/", exist_ok=True)
+        test_file = ".".join(checkpoint.split("/")[-1].split(".")[:-1]) + ".txt"
+        test_out_file = "/".join(checkpoint.split("/")[:-2]) + "/tests/" + test_file
+        check_point = torch.load(checkpoint)
+        Net.load_state_dict(check_point["model_state_dict"])
+        print("Checkpoint loaded...")
+    else:
+        test_out_file = "./trained_models/{}/{}/{}".format(
+            config.data.version, config.model.architecture, config_name
+        )
+        os.makedirs(test_out_file, exist_ok=True)
+        test_out_file += "/test.txt"
+
+    print(f"Output file for test results: {test_out_file}")
 
     if dataset.lower() == "all":
         test_all_datasets(Net, test_out_file, config, checkpoint, device)

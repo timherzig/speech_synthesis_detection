@@ -1,4 +1,5 @@
 import sys
+import torch
 from torch.utils.data.dataloader import DataLoader
 from src.data.collate import collate_function
 from src.data.InTheWild_Data import InTheWildDataset
@@ -7,121 +8,183 @@ from src.data.LA_Data import PrepASV15Dataset, PrepASV19Dataset, PrepASV21Datase
 
 
 def get_dataloaders(config, device):
-    root_path = config.data.root_dir
+    if type(config.data.version) == str:
+        config.data.version = [config.data.version]
+        config.data.root_dir = [config.data.root_dir]
 
-    if config.data.data_type == "time_frame":
-        if config.data.version == "LA_15":
-            train_protocol_file_path = root_path + "CM_protocol/cm_train.trn.txt"
-            dev_protocol_file_path = root_path + "CM_protocol/cm_develop.ndx.txt"
-            eval_protocol_file_path = root_path + "CM_protocol/cm_evaluation.ndx.txt"
-            train_data_path = root_path + "data/train_6/"
-            dev_data_path = root_path + "data/dev_6/"
-            eval_data_path = root_path + "data/eval_6/"
-        elif config.data.version == "LA_19":
-            train_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt"
+    train_ds = []
+    dev_ds = []
+    eval_ds = []
+    weights = []
+
+    for i in range(len(config.data.version)):
+        version = config.data.version[i]
+        root_path = config.data.root_dir[i]
+
+        if config.data.data_type == "time_frame":
+            if version == "LA_15":
+                train_protocol_file_path = root_path + "CM_protocol/cm_train.trn.txt"
+                dev_protocol_file_path = root_path + "CM_protocol/cm_develop.ndx.txt"
+                eval_protocol_file_path = (
+                    root_path + "CM_protocol/cm_evaluation.ndx.txt"
+                )
+                train_data_path = root_path + "data/train_6/"
+                dev_data_path = root_path + "data/dev_6/"
+                eval_data_path = root_path + "data/eval_6/"
+            elif version == "LA_19":
+                train_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt"
+                )
+                dev_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt"
+                )
+                eval_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.eval.trl.txt"
+                )
+                train_data_path = root_path + "data/train_6/"
+                dev_data_path = root_path + "data/dev_6/"
+                eval_data_path = root_path + "data/eval_6/"
+            elif version == "LA_21":
+                eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
+                eval_data_path = root_path + "data/eval_6/"
+            elif version == "InTheWild":
+                eval_protocol_file_path = root_path + "meta.csv"
+                eval_data_path = root_path + "data/eval_6/"
+            else:  # "FakeOrReal"
+                train_protocol_file_path = root_path + "train.csv"
+                dev_protocol_file_path = root_path + "val.csv"
+                eval_protocol_file_path = root_path + "test.csv"
+                train_data_path = root_path + "data/train_6/"
+                dev_data_path = root_path + "data/val_6/"
+                eval_data_path = root_path + "data/test_6/"
+
+        elif config.data.data_type == "CQT":
+            if version == "LA_15":
+                train_protocol_file_path = root_path + "CM_protocol/cm_train.trn.txt"
+                dev_protocol_file_path = root_path + "CM_protocol/cm_develop.ndx.txt"
+                eval_protocol_file_path = (
+                    root_path + "CM_protocol/cm_evaluation.ndx.txt"
+                )
+                train_data_path = root_path + "data/train_6.4_cqt/"
+                dev_data_path = root_path + "data/dev_6.4_cqt/"
+                eval_data_path = root_path + "data/eval_6.4_cqt/"
+            elif version == "LA_19":
+                train_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt"
+                )
+                dev_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt"
+                )
+                eval_protocol_file_path = (
+                    root_path
+                    + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.eval.trl.txt"
+                )
+                train_data_path = root_path + "data/train_6.4_cqt/"
+                dev_data_path = root_path + "data/dev_6.4_cqt/"
+                eval_data_path = root_path + "data/eval_6.4_cqt/"
+            elif version == "LA_21":
+                eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
+                eval_data_path = root_path + "data/eval_6/"
+            elif version == "InTheWild":
+                eval_protocol_file_path = root_path + "meta.csv"
+                eval_data_path = root_path + "data/eval_6.4_cqt/"
+            else:  # "FakeOrReal" CQT not yet implemented for this dataset
+                raise NotImplementedError
+        else:
+            print("Program only supports 'time_frame' and 'CQT' data types.")
+            sys.exit()
+
+        # TODO: Prepare data and set training parameters
+        if version == "LA_15":
+            train_ds.append(
+                PrepASV15Dataset(
+                    train_protocol_file_path,
+                    train_data_path,
+                    data_type=config.data.data_type,
+                )
             )
-            dev_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt"
+            dev_ds.append(
+                PrepASV15Dataset(
+                    dev_protocol_file_path,
+                    dev_data_path,
+                    data_type=config.data.data_type,
+                )
             )
-            eval_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.eval.trl.txt"
+            eval_ds.append(
+                PrepASV15Dataset(
+                    eval_protocol_file_path,
+                    eval_data_path,
+                    data_type=config.data.data_type,
+                )
             )
-            train_data_path = root_path + "data/train_6/"
-            dev_data_path = root_path + "data/dev_6/"
-            eval_data_path = root_path + "data/eval_6/"
-        elif config.data.version == "LA_21":
-            eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
-            eval_data_path = root_path + "data/eval_6/"
-        elif config.data.version == "InTheWild":
-            eval_protocol_file_path = root_path + "meta.csv"
-            eval_data_path = root_path + "data/eval_6/"
+        elif version == "LA_19":
+            train_ds.append(
+                PrepASV19Dataset(
+                    train_protocol_file_path,
+                    train_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            dev_ds.append(
+                PrepASV19Dataset(
+                    dev_protocol_file_path,
+                    dev_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            eval_ds.append(
+                PrepASV19Dataset(
+                    eval_protocol_file_path,
+                    eval_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+        elif version == "LA_21":
+            eval_ds.append(
+                PrepASV21Dataset(
+                    eval_protocol_file_path,
+                    eval_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+        elif version == "InTheWild":
+            eval_ds.append(
+                InTheWildDataset(
+                    eval_protocol_file_path,
+                    eval_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
         else:  # "FakeOrReal"
-            train_protocol_file_path = root_path + "train.csv"
-            dev_protocol_file_path = root_path + "val.csv"
-            eval_protocol_file_path = root_path + "test.csv"
-            train_data_path = root_path + "data/train_6/"
-            dev_data_path = root_path + "data/val_6/"
-            eval_data_path = root_path + "data/test_6/"
+            train_ds.append(
+                FakeOrRealDataset(
+                    train_protocol_file_path,
+                    train_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            dev_ds.append(
+                FakeOrRealDataset(
+                    dev_protocol_file_path,
+                    dev_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            eval_ds.append(
+                FakeOrRealDataset(
+                    eval_protocol_file_path,
+                    eval_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
 
-    elif config.data.data_type == "CQT":
-        if config.data.version == "LA_15":
-            train_protocol_file_path = root_path + "CM_protocol/cm_train.trn.txt"
-            dev_protocol_file_path = root_path + "CM_protocol/cm_develop.ndx.txt"
-            eval_protocol_file_path = root_path + "CM_protocol/cm_evaluation.ndx.txt"
-            train_data_path = root_path + "data/train_6.4_cqt/"
-            dev_data_path = root_path + "data/dev_6.4_cqt/"
-            eval_data_path = root_path + "data/eval_6.4_cqt/"
-        elif config.data.version == "LA_19":
-            train_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt"
-            )
-            dev_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt"
-            )
-            eval_protocol_file_path = (
-                root_path
-                + "ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.eval.trl.txt"
-            )
-            train_data_path = root_path + "data/train_6.4_cqt/"
-            dev_data_path = root_path + "data/dev_6.4_cqt/"
-            eval_data_path = root_path + "data/eval_6.4_cqt/"
-        elif config.data.version == "LA_21":
-            eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
-            eval_data_path = root_path + "data/eval_6/"
-        elif config.data.version == "InTheWild":
-            eval_protocol_file_path = root_path + "meta.csv"
-            eval_data_path = root_path + "data/eval_6.4_cqt/"
-        else:  # "FakeOrReal" CQT not yet implemented for this dataset
-            raise NotImplementedError
-    else:
-        print("Program only supports 'time_frame' and 'CQT' data types.")
-        sys.exit()
-
-    # TODO: Prepare data and set training parameters
-    if config.data.version == "LA_15":
-        train_set = PrepASV15Dataset(
-            train_protocol_file_path, train_data_path, data_type=config.data.data_type
-        )
-        dev_set = PrepASV15Dataset(
-            dev_protocol_file_path, dev_data_path, data_type=config.data.data_type
-        )
-        eval_set = PrepASV15Dataset(
-            eval_protocol_file_path, eval_data_path, data_type=config.data.data_type
-        )
-    elif config.data.version == "LA_19":
-        train_set = PrepASV19Dataset(
-            train_protocol_file_path, train_data_path, data_type=config.data.data_type
-        )
-        dev_set = PrepASV19Dataset(
-            dev_protocol_file_path, dev_data_path, data_type=config.data.data_type
-        )
-        eval_set = PrepASV19Dataset(
-            eval_protocol_file_path, eval_data_path, data_type=config.data.data_type
-        )
-    elif config.data.version == "LA_21":
-        eval_set = PrepASV21Dataset(
-            eval_protocol_file_path, eval_data_path, data_type=config.data.data_type
-        )
-    elif config.data.version == "InTheWild":
-        eval_set = InTheWildDataset(
-            eval_protocol_file_path, eval_data_path, data_type=config.data.data_type
-        )
-    else:  # "FakeOrReal"
-        train_set = FakeOrRealDataset(
-            train_protocol_file_path, train_data_path, data_type=config.data.data_type
-        )
-        dev_set = FakeOrRealDataset(
-            dev_protocol_file_path, dev_data_path, data_type=config.data.data_type
-        )
-        eval_set = FakeOrRealDataset(
-            eval_protocol_file_path, eval_data_path, data_type=config.data.data_type
-        )
+    eval_set = torch.utils.data.ConcatDataset(eval_ds)
+    print(f"Number of eval samples in {config.data.version}: {len(eval_set)}")
 
     eval_loader = DataLoader(
         eval_set,
@@ -130,10 +193,16 @@ def get_dataloaders(config, device):
         num_workers=config.num_workers,
     )
 
-    if config.data.version == "LA_21" or config.data.version == "InTheWild":
+    if len(train_ds) == 0 and len(dev_ds) == 0:
         return None, None, eval_loader, None
 
-    weights = train_set.get_weights().to(device)  # weight used for WCE
+    for i in range(len(train_ds)):
+        weights.append(train_ds[i].get_weights())
+
+    weights = torch.mean(torch.stack(weights), dim=0).to(device)
+
+    train_set = torch.utils.data.ConcatDataset(train_ds)
+    print(f"Number of train samples in {config.data.version}: {len(train_set)}")
     train_loader = DataLoader(
         train_set,
         batch_size=config.batch_size,
@@ -141,6 +210,9 @@ def get_dataloaders(config, device):
         num_workers=config.num_workers,
         collate_fn=lambda x: collate_function(x, config),
     )
+
+    dev_set = torch.utils.data.ConcatDataset(dev_ds)
+    print(f"Number of dev samples in {config.data.version}: {len(dev_set)}")
     dev_loader = DataLoader(
         dev_set,
         batch_size=config.batch_size,

@@ -1,7 +1,7 @@
 data:
-  root_dir: '/netscratch/herzig/datasets/LA/' #'/ds/LA/'
-  version: 19 # 19 or 15
-  data_type: 'time_frame' # 'time_frame' (dim 1) or 'CQT' (dim 2)
+  root_dir: '/ds/audio/LA_19/'
+  version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
+  data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
 
 model:
@@ -22,7 +22,7 @@ model:
   activation: 'softmax'
 
 
-batch_size: 128
+batch_size: 64
 num_workers: 8
-num_epochs: 100
+num_epochs: 50
 lr: 0.001

@@ -3,13 +3,12 @@ data:
   version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
-
 model:
-  architecture: 'aasist'
+  architecture: 'rawgat'
   size: 'default'
   shared_first_last: False
-  aasist_config: 'src/models/architectures/aasist/config/AASIST.conf'
-  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST.pth' # Null
+  rawgat_config: 'src/models/architectures/rawgat/model_config_RawGAT_ST.yaml'
+  rawgat_weights: 'src/models/architectures/rawgat/Pre_trained_models/RawGAT_ST_mul/Best_epoch.pth' # Null
   activation: 'softmax'
 
 batch_size: 32

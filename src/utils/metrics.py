@@ -107,6 +107,7 @@ def cal_roc_eer(probs, show_plot=True):
 
 def cal_roc_eer_sub_class(probs, sub_classes, show_plot=True):
     assert probs.shape[0] == sub_classes.shape[0], "Number of samples not equal."
+    out_string = ""
 
     for sub_class in torch.unique(sub_classes):
         if sub_class == 0.0 or sub_class == -1.0:
@@ -118,4 +119,8 @@ def cal_roc_eer_sub_class(probs, sub_classes, show_plot=True):
         index = torch.cat((sub_class_index, zero_class_index, neg_class_index), dim=0)
         sub_class_probs = probs[index, :]
         eer = cal_roc_eer(sub_class_probs, show_plot=show_plot)
-        print(f"Sub Class {sub_class} EER: {eer*100:.4f}")
+        s = f"Sub Class {sub_class} EER: {eer*100:.4f}\n"
+        print(s)
+        out_string += s
+
+    return out_string

@@ -28,8 +28,9 @@ def train(config, config_name):
     train_loader, dev_loader, eval_loader, class_weights = get_dataloaders(
         config, device
     )
+    print(f"Class weights: {class_weights}")
 
-    Net = get_model(config).to(device)
+    Net = get_model(config, device).to(device)
 
     num_total_learnable_params = sum(
         i.numel() for i in Net.parameters() if i.requires_grad
@@ -38,6 +39,7 @@ def train(config, config_name):
 
     optimizer = optim.Adam(Net.parameters(), lr=config.lr)
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+    # scheduler = optim.lr_scheduler.StepLrq(optimizer, step_size=10, gamma=0.75)
     loss_type = "WCE"  # {'WCE', 'mixup'}
 
     print(
@@ -57,7 +59,7 @@ def train(config, config_name):
     time_name = time_name.replace(":", "_")
 
     path = "./trained_models/{}/{}/{}".format(
-        config.data.version, config.model.architecture, config_name
+        "".join(config.data.version), config.model.architecture, config_name
     )
 
     if os.path.exists(path):
@@ -147,7 +149,7 @@ def train(config, config_name):
                 + str(epoch)
                 + "_"
                 + "ASVspoof20"
-                + str(config.data.version)
+                + str("".join(config.data.version))
                 + "_LA_Loss_"
                 + str(round(total_loss / counter, 4))
                 + "_dEER_"

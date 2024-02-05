@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from src.models.architectures.resnet_block import resnet
 from src.models.architectures.inception_block import inception
 from src.models.architectures.aasist_block import aasist
+from src.models.architectures.rawgat_block import rawgat
 
 from src.utils.loss import AMSoftmax, OCSoftmax
 
@@ -88,7 +89,7 @@ class last_layers(nn.Module):
 
 
 class build_model(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device):
         super().__init__()
         self.config = config
         self.layers = nn.ModuleList()
@@ -102,6 +103,8 @@ class build_model(nn.Module):
             self.layers.append(inception(self.config))
         elif self.config.model.architecture == "aasist":
             self.layers.append(aasist(self.config))
+        elif self.config.model.architecture == "rawgat":
+            self.layers.append(rawgat(self.config, device))
         else:
             raise NotImplementedError
 
