@@ -18,7 +18,7 @@ from src.data.data import get_dataloaders
 from src.utils.metrics import asv_cal_accuracies, cal_roc_eer
 
 
-def train(config, config_name):
+def train(config, config_name, vocal=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if not os.path.exists("./trained_models/"):
@@ -123,6 +123,17 @@ def train(config, config_name):
         loss_per_epoch[epoch] = total_loss / counter
         scheduler.step()  # update lr
 
+        if vocal:
+            train_accuracy, t_probs, _ = asv_cal_accuracies(
+                net=Net,
+                device=device,
+                data_loader=train_loader,
+            )
+            t_eer = cal_roc_eer(t_probs, show_plot=False)
+        else:
+            train_accuracy = 0.00
+            t_eer = 0.99
+
         dev_accuracy, d_probs, _ = asv_cal_accuracies(
             net=Net,
             device=device,
@@ -173,14 +184,16 @@ def train(config, config_name):
         elapsed = time.time() - t
 
         print_str = (
-            "Epoch: {}, Elapsed: {:.2f} mins, lr: {:.3f}e-3, Loss: {:.4f}, d_acc: {:.2f}%, e_acc: {:.2f}%, "
-            "dEER: {:.2f}%, eEER: {:.2f}%, best_dEER: {:.2f}% from epoch {}.".format(
+            "Epoch: {}, Elapsed: {:.2f} mins, lr: {:.3f}e-3, Loss: {:.4f}, t_acc: {:.2f}%, d_acc: {:.2f}%, e_acc: {:.2f}%, "
+            "tEER: {:.2f}%, dEER: {:.2f}%, eEER: {:.2f}%, best_dEER: {:.2f}% from epoch {}.".format(
                 epoch,
                 elapsed / 60,
                 optimizer.param_groups[0]["lr"] * 1000,
                 total_loss / counter,
+                train_accuracy * 100,
                 dev_accuracy * 100,
                 eval_accuracy * 100,
+                t_eer * 100,
                 d_eer * 100,
                 e_eer * 100,
                 best_d_eer[0] * 100,

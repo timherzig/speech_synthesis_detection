@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.models.architectures.resnet_block import resnet
+from src.models.architectures.resnet_w_dilation_block import resnet_w_dilation
 from src.models.architectures.inception_block import inception
 from src.models.architectures.aasist_block import aasist
 from src.models.architectures.rawgat_block import rawgat
@@ -99,6 +100,8 @@ class build_model(nn.Module):
 
         if self.config.model.architecture == "resnet":
             self.layers.append(resnet(self.config))
+        if self.config.model.architecture == "resnet_w_dilation":
+            self.layers.append(resnet_w_dilation(self.config))
         elif self.config.model.architecture == "inception":
             self.layers.append(inception(self.config))
         elif self.config.model.architecture == "aasist":
