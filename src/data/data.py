@@ -191,6 +191,7 @@ def get_dataloaders(config, device):
         batch_size=config.batch_size,
         shuffle=False,
         num_workers=config.num_workers,
+        collate_fn=lambda x: collate_function(x, config),
     )
 
     if len(train_ds) == 0 and len(dev_ds) == 0:
@@ -218,6 +219,7 @@ def get_dataloaders(config, device):
         batch_size=config.batch_size,
         shuffle=False,
         num_workers=config.num_workers,
+        collate_fn=lambda x: collate_function(x, config),
     )
 
     return train_loader, dev_loader, eval_loader, weights

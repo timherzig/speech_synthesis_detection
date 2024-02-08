@@ -44,4 +44,12 @@ def parse_args():
         help="Which tests to perform (19/21/all)",
     )
 
+    # Vocal (if all information should be printed)
+    parser.add_argument(
+        "--vocal",
+        default=False,
+        type=bool,
+        help="Print all information",
+    )
+
     return parser.parse_args()

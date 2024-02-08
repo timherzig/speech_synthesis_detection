@@ -1,5 +1,6 @@
 import os
 import torch
+import librosa
 import pandas as pd
 import soundfile as sf
 
@@ -19,7 +20,9 @@ class FakeOrRealDataset(Dataset):
         data_file_path = os.path.join(self.data_path, self.protocol.iloc[index, 0])
 
         if self.data_type == "time_frame":
-            sample, _ = sf.read(data_file_path)
+            sample, sr = sf.read(data_file_path)
+            if sr != 16000:
+                librosa.resample(sample, sr, 16000)
             sample = torch.tensor(sample, dtype=torch.float32)
             sample = torch.unsqueeze(sample, 0)
             label = self.protocol.iloc[index, 1]
