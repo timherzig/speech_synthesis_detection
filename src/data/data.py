@@ -7,7 +7,7 @@ from src.data.FakeOrReal_Data import FakeOrRealDataset
 from src.data.LA_Data import PrepASV15Dataset, PrepASV19Dataset, PrepASV21Dataset
 
 
-def get_dataloaders(config, device):
+def get_dataloaders(config, device, pooled=False):
     if type(config.data.version) == str:
         config.data.version = [config.data.version]
         config.data.root_dir = [config.data.root_dir]
@@ -249,6 +249,9 @@ def get_dataloaders(config, device):
     eval_set = torch.utils.data.ConcatDataset(eval_ds)
     print(f"Number of eval samples in {config.data.version}: {len(eval_set)}")
 
+    if pooled:
+        eval_ds.extend(dev_ds)
+
     eval_loader = DataLoader(
         eval_set,
         batch_size=config.batch_size,
@@ -257,7 +260,7 @@ def get_dataloaders(config, device):
         collate_fn=lambda x: collate_function(x, config),
     )
 
-    if len(train_ds) == 0 and len(dev_ds) == 0:
+    if (len(train_ds) == 0 and len(dev_ds) == 0) or pooled:
         return None, None, eval_loader, None
 
     for i in range(len(train_ds)):
