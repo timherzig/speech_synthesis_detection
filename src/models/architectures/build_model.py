@@ -118,4 +118,5 @@ class build_model(nn.Module):
 
     def forward(self, x):
         x, labels = x
+
         return self.model((x, labels))

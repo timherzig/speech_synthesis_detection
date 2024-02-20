@@ -88,9 +88,9 @@ class RNBlock2D(nn.Module):
             dilation=config.model.resnet.dilation,
         )
 
-        self.bn1 = nn.BatchNorm1d(out_channels)
-        self.bn2 = nn.BatchNorm1d(out_channels)
-        self.bn3 = nn.BatchNorm1d(out_channels)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.bn3 = nn.BatchNorm2d(out_channels)
 
         self.nin = nn.Conv2d(
             in_channels,
@@ -143,7 +143,7 @@ class resnet_w_dilation(nn.Module):
             )
             self.last_avg_pool_ks = config.model.resnet.blocks[-1].max_pool_ks
         elif config.model.dim == 2:
-            self.last_block = RNBlock1D(
+            self.last_block = RNBlock2D(
                 config,
                 config.model.resnet.blocks[-1].in_channels,
                 config.model.resnet.blocks[-1].out_channels,
@@ -169,4 +169,5 @@ class resnet_w_dilation(nn.Module):
         elif self.config.model.dim == 2:
             x = F.avg_pool2d(x, kernel_size=self.last_avg_pool_ks)
 
-        return (torch.flatten(x, start_dim=1), labels)
+        x = torch.flatten(x, start_dim=1)
+        return (x, labels)
