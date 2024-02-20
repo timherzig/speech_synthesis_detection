@@ -1,0 +1,21 @@
+data:
+  root_dir: ["/ds/audio/LA_19/"]
+  version: ["LA_19"] # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
+  data_type: 'time_frame' # 'time_frame' or 'CQT'
+  aug_prob: 0.0
+  mms: False
+  spectogram: False
+  mix_up: False
+
+model:
+  architecture: 'aasist'
+  size: 'default'
+  shared_first_last: False
+  aasist_config: 'src/models/architectures/aasist/config/AASIST.conf'
+  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST.pth' # Null
+  activation: 'softmax'
+
+batch_size: 32
+num_workers: 8
+num_epochs: 50
+lr: 0.0001

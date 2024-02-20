@@ -4,6 +4,8 @@ data:
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
   mms: True
+  spectogram: False
+  mix_up: False
 
 model:
   architecture: 'resnet_w_dilation'
@@ -16,11 +18,12 @@ model:
     blocks: [{'in_channels': 16, 'out_channels': 32, 'max_pool_ks': 4},
              {'in_channels': 32, 'out_channels': 64, 'max_pool_ks': 4},
              {'in_channels': 64, 'out_channels': 128, 'max_pool_ks': 4},
-             {'in_channels': 128, 'out_channels': 128, 'max_pool_ks': 375}]
+             {'in_channels': 128, 'out_channels': 256, 'max_pool_ks': 4},
+             {'in_channels': 256, 'out_channels': 256, 'max_pool_ks': 375}]
     conv_kernel_size: 3
     padding: 2
     dilation: 2 # 1 for no dilation, add 1 to padding for each addition to dilation to keep the same dimensions
-  fc1: {'in_features': 128, 'out_features': 64}
+  fc1: {'in_features': 256, 'out_features': 64}
   fc2: {'in_features': 64, 'out_features': 32}
   out: {'in_features': 32, 'out_features': 2}
   activation: 'softmax'

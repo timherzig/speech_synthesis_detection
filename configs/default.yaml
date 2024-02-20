@@ -5,6 +5,8 @@ data:
   version: ["LA_19", "InTheWild"] # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.5
+  mms: False
+  spectogram: False
 
 model:
   architecture: 'inception'

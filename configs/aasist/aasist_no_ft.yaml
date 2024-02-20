@@ -3,16 +3,19 @@ data:
   version: "LA_19" # LA_15, LA_19, LA_21 for testing, InTheWild, FakeOrReal
   data_type: 'time_frame' # 'time_frame' or 'CQT'
   aug_prob: 0.0
+  mms: False
+  spectogram: False
+  mix_up: False
 
 model:
   architecture: 'aasist'
-  size: 'default_small'
+  size: 'default'
   shared_first_last: False
-  aasist_config: 'src/models/architectures/aasist/config/AASIST-L.conf'
-  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST-L.pth' # Null
+  aasist_config: 'src/models/architectures/aasist/config/AASIST.conf'
+  aasist_weights: 'src/models/architectures/aasist/models/weights/AASIST.pth' # Null
   activation: 'softmax'
 
 batch_size: 32
 num_workers: 8
-num_epochs: 10
+num_epochs: 0
 lr: 0.00001
