@@ -1,6 +1,7 @@
 import os
 import torch
 import librosa
+import numpy as np
 import pandas as pd
 import soundfile as sf
 
@@ -31,9 +32,21 @@ class FakeOrRealDataset(Dataset):
             return sample, label, sub_class
 
         if self.data_type == "CQT":
+            data_file_path = data_file_path.replace(".wav", ".pt")
+            data_file_path = data_file_path.replace(".mp3", ".pt")
             sample = torch.load(data_file_path)
             sample = torch.tensor(sample, dtype=torch.float32)
             sample = torch.unsqueeze(sample, 0)
+            label = self.protocol.iloc[index, 1]
+            label = label_encode(label)
+            sub_class = torch.tensor(-1, dtype=torch.int64)
+            return sample, label, sub_class
+
+        if self.data_type == "mel":
+            data_file_path = data_file_path.replace(".wav", ".npz")
+            data_file_path = data_file_path.replace(".mp3", ".npz")
+            sample = np.load(data_file_path)
+            sample = torch.tensor(sample["arr_0"], dtype=torch.float32)
             label = self.protocol.iloc[index, 1]
             label = label_encode(label)
             sub_class = torch.tensor(-1, dtype=torch.int64)
