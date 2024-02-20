@@ -48,11 +48,21 @@ def get_dataloaders(config, device):
                 dev_data_path = root_path + "data/dev_6/"
                 eval_data_path = root_path + "data/eval_6/"
             elif version == "LA_21":
-                eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
-                eval_data_path = root_path + "data/eval_6/"
+                # eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
+                train_protocol_file_path = root_path + "keys/LA/CM/train.txt"
+                train_data_path = root_path + "data/eval_6/"
+                dev_protocol_file_path = root_path + "keys/LA/CM/val.txt"
+                dev_data_path = root_path + "data/eval_6/"
+                test_protocol_file_path = root_path + "keys/LA/CM/test.txt"
+                test_data_path = root_path + "data/eval_6/"
             elif version == "InTheWild":
-                eval_protocol_file_path = root_path + "meta.csv"
+                # eval_protocol_file_path = root_path + "meta.csv"
+                eval_protocol_file_path = root_path + "val.csv"
                 eval_data_path = root_path + "data/eval_6/"
+                train_protocol_file_path = root_path + "train.csv"
+                train_data_path = root_path + "data/eval_6/"
+                dev_protocol_file_path = root_path + "val.csv"
+                dev_data_path = root_path + "data/eval_6/"
             else:  # "FakeOrReal"
                 train_protocol_file_path = root_path + "train.csv"
                 dev_protocol_file_path = root_path + "val.csv"
@@ -88,15 +98,40 @@ def get_dataloaders(config, device):
                 dev_data_path = root_path + "data/dev_6.4_cqt/"
                 eval_data_path = root_path + "data/eval_6.4_cqt/"
             elif version == "LA_21":
-                eval_protocol_file_path = root_path + "keys/LA/CM/trial_metadata.txt"
-                eval_data_path = root_path + "data/eval_6/"
+                train_protocol_file_path = root_path + "keys/LA/CM/train.txt"
+                train_data_path = root_path + "data/eval_6.4_cqt/"
+                dev_protocol_file_path = root_path + "keys/LA/CM/val.txt"
+                dev_data_path = root_path + "data/eval_6.4_cqt/"
+                test_protocol_file_path = root_path + "keys/LA/CM/test.txt"
+                test_data_path = root_path + "data/eval_6.4_cqt/"
             elif version == "InTheWild":
-                eval_protocol_file_path = root_path + "meta.csv"
+                eval_protocol_file_path = root_path + "val.csv"
                 eval_data_path = root_path + "data/eval_6.4_cqt/"
+                train_protocol_file_path = root_path + "train.csv"
+                train_data_path = root_path + "data/eval_6.4_cqt/"
+                dev_protocol_file_path = root_path + "val.csv"
+                dev_data_path = root_path + "data/eval_6.4_cqt/"
             else:  # "FakeOrReal" CQT not yet implemented for this dataset
                 raise NotImplementedError
+        elif config.data.data_type == "mel":
+            if version == "LA_15":
+                raise NotImplementedError
+            elif version == "LA_19":
+                raise NotImplementedError
+            elif version == "LA_21":
+                raise NotImplementedError
+            elif version == "InTheWild":
+                raise NotImplementedError
+            else:  # "FakeOrReal"
+                train_protocol_file_path = root_path + "train.csv"
+                dev_protocol_file_path = root_path + "val.csv"
+                eval_protocol_file_path = root_path + "test.csv"
+                train_data_path = root_path + "data/train_6_mel/"
+                dev_data_path = root_path + "data/val_6_mel/"
+                eval_data_path = root_path + "data/test_6_mel/"
+
         else:
-            print("Program only supports 'time_frame' and 'CQT' data types.")
+            print("Program only supports 'time_frame', 'CQT' and 'mel' data types.")
             sys.exit()
 
         # TODO: Prepare data and set training parameters
@@ -145,6 +180,20 @@ def get_dataloaders(config, device):
                 )
             )
         elif version == "LA_21":
+            train_ds.append(
+                PrepASV21Dataset(
+                    train_protocol_file_path,
+                    train_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            dev_ds.append(
+                PrepASV21Dataset(
+                    dev_protocol_file_path,
+                    dev_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
             eval_ds.append(
                 PrepASV21Dataset(
                     eval_protocol_file_path,
@@ -153,6 +202,20 @@ def get_dataloaders(config, device):
                 )
             )
         elif version == "InTheWild":
+            train_ds.append(
+                InTheWildDataset(
+                    train_protocol_file_path,
+                    train_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
+            dev_ds.append(
+                InTheWildDataset(
+                    dev_protocol_file_path,
+                    dev_data_path,
+                    data_type=config.data.data_type,
+                )
+            )
             eval_ds.append(
                 InTheWildDataset(
                     eval_protocol_file_path,
