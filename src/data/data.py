@@ -246,11 +246,13 @@ def get_dataloaders(config, device, pooled=False):
                 )
             )
 
+    if pooled:
+        print(f"pre pool len: {len(eval_ds)}")
+        eval_ds.extend(dev_ds)
+        print(f"post pool len: {len(eval_ds)}")
+
     eval_set = torch.utils.data.ConcatDataset(eval_ds)
     print(f"Number of eval samples in {config.data.version}: {len(eval_set)}")
-
-    if pooled:
-        eval_ds.extend(dev_ds)
 
     eval_loader = DataLoader(
         eval_set,

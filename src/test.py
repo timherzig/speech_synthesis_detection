@@ -298,6 +298,7 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
 
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
+    _, _, pooled_eval_loader, _ = get_dataloaders(config, device, pooled=True)
 
     accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
@@ -305,23 +306,24 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
         data_loader=eval_loader,
     )
 
-    pre_ts_eer = cal_roc_eer(probabilities, show_plot=False)
+    eer = cal_roc_eer(probabilities, show_plot=False)
 
-    print(
-        "EER without temperature scaling: {:.2f}% for {}.".format(
-            pre_ts_eer * 100, checkpoint
-        )
+    _, probabilities, sub_classes = asv_cal_accuracies(
+        net=Net,
+        device=device,
+        data_loader=pooled_eval_loader,
     )
+
+    pooled_eer = cal_roc_eer(probabilities, show_plot=False)
+
+    print("EER: {:.2f}% for {}.".format(eer * 100, checkpoint))
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"----------------Evaluation results using {config.data.root_dir.split('/')[-1]}_{config.data.version} dataset.----------------\n"
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
         )
-        f.write(
-            "EER without temperature scaling: {:.2f}% for {}.\n".format(
-                pre_ts_eer * 100, checkpoint
-            )
-        )
+        f.write("EER: {:.2f}% for {}.\n".format(eer * 100, checkpoint))
+        f.write("Pooled EER: {:.2f}% for {}.\n".format(pooled_eer * 100, checkpoint))
         f.write(
             "------------------------------------------------------------------------------------------------------------------------\n"
         )
