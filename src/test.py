@@ -11,6 +11,7 @@ from src.models.model import get_model
 LA_19_ROOT = "/ds/audio/LA_19/"
 LA_21_ROOT = "/ds/audio/LA_21/"
 FAKEORREAL_ROOT = "/ds/audio/FakeOrReal/"
+FAKEORREALNORM_ROOT = "/ds/audio/FakeOrRealNorm/"
 INTHEWILD_ROOT = "/ds/audio/InTheWild/"
 
 
@@ -138,6 +139,7 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
 
     # Get dataloaders
     _, _, eval_loader, _ = get_dataloaders(config, device)
+    _, _, pooled_eval_loader, _ = get_dataloaders(config, device, pooled=True)
 
     accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
@@ -330,6 +332,46 @@ def test_FakeOrReal(Net, test_out_file, config, checkpoint, device):
         f.close()
 
 
+def test_FakeOrRealNorm(Net, test_out_file, config, checkpoint, device):
+    # Test FakeOrReal
+    config.data.root_dir = FAKEORREALNORM_ROOT
+    config.data.version = "FakeOrRealNorm"
+    print(f"---------FakeOrReal---------")
+
+    # Get dataloaders
+    _, _, eval_loader, _ = get_dataloaders(config, device)
+    _, _, pooled_eval_loader, _ = get_dataloaders(config, device, pooled=True)
+
+    accuracy, probabilities, sub_classes = asv_cal_accuracies(
+        net=Net,
+        device=device,
+        data_loader=eval_loader,
+    )
+
+    eer = cal_roc_eer(probabilities, show_plot=False)
+
+    _, probabilities, sub_classes = asv_cal_accuracies(
+        net=Net,
+        device=device,
+        data_loader=pooled_eval_loader,
+    )
+
+    pooled_eer = cal_roc_eer(probabilities, show_plot=False)
+
+    print("EER: {:.2f}% for {}.".format(eer * 100, checkpoint))
+
+    with open(test_out_file, "a") as f:
+        f.write(
+            f"----------------Evaluation results using {config.data.root_dir[0].split('/')[-1]}_{config.data.version[0]} dataset.----------------\n"
+        )
+        f.write("EER: {:.2f}% for {}.\n".format(eer * 100, checkpoint))
+        f.write("Pooled EER: {:.2f}% for {}.\n".format(pooled_eer * 100, checkpoint))
+        f.write(
+            "------------------------------------------------------------------------------------------------------------------------\n"
+        )
+        f.close()
+
+
 def test_InTheWild(Net, test_out_file, config, checkpoint, device):
     # Test InTheWild
     config.data.root_dir = INTHEWILD_ROOT
@@ -401,5 +443,7 @@ def test(config, checkpoint=None, dataset="all", config_name="default"):
         test_FakeOrReal(Net, test_out_file, config, checkpoint, device)
     elif dataset.lower() == "inthewild":
         test_InTheWild(Net, test_out_file, config, checkpoint, device)
+    elif dataset.lower() == "fakeorrealnorm":
+        test_FakeOrRealNorm(Net, test_out_file, config, checkpoint, device)
     else:
         raise NotImplementedError(f"{dataset} dataset testing not implemented")

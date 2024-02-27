@@ -22,10 +22,16 @@ def gen_time_frame(
     num_files = len(protocol.index)
     total_sample_count = 0
 
+    in_file_index = file_index
+    # if "FakeOrRealNorm" in read_audio_path:
+    #     in_file_index = file_index + "_16k.wav_norm.wav_mono.wav_silence.wav"
+
+    deleted = 0
+
     for i in tqdm(range(num_files)):
         try:
             label_dir = "fake" if label_index[i] == "spoof" else "real"
-            x, fs = sf.read(os.path.join(read_audio_path, label_dir, file_index[i]))
+            x, fs = sf.read(os.path.join(read_audio_path, label_dir, in_file_index[i]))
             if sr != fs:
                 x = librosa.resample(x, orig_sr=fs, target_sr=sr)
                 fs = sr
@@ -35,13 +41,14 @@ def gen_time_frame(
             total_sample_count += 1
             sf.write(os.path.join(sub_path, file_index[i]), x, fs)
         except:
+            deleted += 1
             protocol = protocol.drop([i])
 
     os.remove(protocol_path)
     protocol.to_csv(protocol_path, index=False)
     print(
-        "{} pieces {}-second {} samples generated.".format(
-            total_sample_count, duration, status
+        "{} pieces {}-second {} samples generated. Deleted {}".format(
+            total_sample_count, duration, status, deleted
         )
     )
 
@@ -173,9 +180,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # build_data_set(args.root_path, "testing")
-    # build_data_set(args.root_path, "training")
-    # build_data_set(args.root_path, "validation")
+    build_data_set(args.root_path, "testing")
+    build_data_set(args.root_path, "training")
+    build_data_set(args.root_path, "validation")
 
     root_path = args.root_path
     train_protocol_path = os.path.join(root_path, "train.csv")
