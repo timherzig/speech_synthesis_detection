@@ -7,7 +7,7 @@ from src.data.FakeOrReal_Data import FakeOrRealDataset
 from src.data.LA_Data import PrepASV15Dataset, PrepASV19Dataset, PrepASV21Dataset
 
 
-def get_dataloaders(config, device, pooled=False):
+def get_dataloaders(config, device, pooled=False, weighted=False):
     if type(config.data.version) == str:
         config.data.version = [config.data.version]
         config.data.root_dir = [config.data.root_dir]
@@ -148,6 +148,7 @@ def get_dataloaders(config, device, pooled=False):
                     dev_protocol_file_path,
                     dev_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
             eval_ds.append(
@@ -155,6 +156,7 @@ def get_dataloaders(config, device, pooled=False):
                     eval_protocol_file_path,
                     eval_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
         elif version == "LA_19":
@@ -170,6 +172,7 @@ def get_dataloaders(config, device, pooled=False):
                     dev_protocol_file_path,
                     dev_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
             eval_ds.append(
@@ -177,6 +180,7 @@ def get_dataloaders(config, device, pooled=False):
                     eval_protocol_file_path,
                     eval_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
         elif version == "LA_21":
@@ -192,6 +196,7 @@ def get_dataloaders(config, device, pooled=False):
                     dev_protocol_file_path,
                     dev_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
             eval_ds.append(
@@ -199,6 +204,7 @@ def get_dataloaders(config, device, pooled=False):
                     eval_protocol_file_path,
                     eval_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
         elif version == "InTheWild":
@@ -214,6 +220,7 @@ def get_dataloaders(config, device, pooled=False):
                     dev_protocol_file_path,
                     dev_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
             eval_ds.append(
@@ -221,6 +228,7 @@ def get_dataloaders(config, device, pooled=False):
                     eval_protocol_file_path,
                     eval_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
         else:  # "FakeOrReal"
@@ -236,6 +244,7 @@ def get_dataloaders(config, device, pooled=False):
                     dev_protocol_file_path,
                     dev_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
             eval_ds.append(
@@ -243,6 +252,7 @@ def get_dataloaders(config, device, pooled=False):
                     eval_protocol_file_path,
                     eval_data_path,
                     data_type=config.data.data_type,
+                    weighted=weighted,
                 )
             )
 
@@ -250,6 +260,9 @@ def get_dataloaders(config, device, pooled=False):
         print(f"pre pool len: {len(eval_ds)}")
         eval_ds.extend(dev_ds)
         print(f"post pool len: {len(eval_ds)}")
+
+    for i in range(len(eval_ds)):
+        print(f"len of eval_ds[{i}]: {len(eval_ds[i])}")
 
     eval_set = torch.utils.data.ConcatDataset(eval_ds)
     print(f"Number of eval samples in {config.data.version}: {len(eval_set)}")

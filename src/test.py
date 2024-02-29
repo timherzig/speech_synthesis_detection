@@ -176,15 +176,17 @@ def test_all_datasets(Net, test_out_file, config, checkpoint, device):
         f.close()
 
 
-def test_all_concat(Net, test_out_file, config, checkpoint, device):
+def test_all_concat(Net, test_out_file, config, checkpoint, device, weighted=False):
     # Test FakeOrReal
     config.data.root_dir = ALL_ROOT
     config.data.version = ["LA_19", "LA_21", "FakeOrReal", "InTheWild"]
     print(f"---------ALL---------")
 
     # Get dataloaders
-    _, _, eval_loader, _ = get_dataloaders(config, device)
-    _, _, pooled_eval_loader, _ = get_dataloaders(config, device, pooled=True)
+    _, _, eval_loader, _ = get_dataloaders(config, device, weighted=weighted)
+    _, _, pooled_eval_loader, _ = get_dataloaders(
+        config, device, pooled=True, weighted=weighted
+    )
 
     accuracy, probabilities, sub_classes = asv_cal_accuracies(
         net=Net,
@@ -206,7 +208,7 @@ def test_all_concat(Net, test_out_file, config, checkpoint, device):
 
     with open(test_out_file, "a") as f:
         f.write(
-            f"----------------Evaluation results using ALL CONCAT dataset.----------------\n"
+            f"----------------Evaluation results using ALL CONCAT weighted {weighted} dataset.----------------\n"
         )
         f.write("EER: {:.2f}% for {}.\n".format(eer * 100, checkpoint))
         f.write("Pooled EER: {:.2f}% for {}.\n".format(pooled_eer * 100, checkpoint))
@@ -483,6 +485,8 @@ def test(config, checkpoint=None, dataset="all", config_name="default"):
 
     if dataset.lower() == "all":
         test_all_datasets(Net, test_out_file, config, checkpoint, device)
+        test_FakeOrRealNorm(Net, test_out_file, config, checkpoint, device)
+        test_all_concat(Net, test_out_file, config, checkpoint, device)
     elif dataset.lower() == "la":
         test_LA(Net, test_out_file, config, checkpoint, device)
     elif dataset.lower() == "fakeorreal":
@@ -493,5 +497,7 @@ def test(config, checkpoint=None, dataset="all", config_name="default"):
         test_FakeOrRealNorm(Net, test_out_file, config, checkpoint, device)
     elif dataset.lower() == "all_concat":
         test_all_concat(Net, test_out_file, config, checkpoint, device)
+    elif dataset.lower() == "all_concat_weigthed":
+        test_all_concat(Net, test_out_file, config, checkpoint, device, weighted=True)
     else:
         raise NotImplementedError(f"{dataset} dataset testing not implemented")

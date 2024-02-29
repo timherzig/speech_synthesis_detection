@@ -1,4 +1,6 @@
+import os
 import torch
+import numpy as np
 import pandas as pd
 import soundfile as sf
 
@@ -6,10 +8,33 @@ from torch.utils.data.dataloader import Dataset
 
 
 class PrepASV21Dataset(Dataset):
-    def __init__(self, protocol_file_path, data_path, data_type="time_frame"):
+    def __init__(
+        self, protocol_file_path, data_path, data_type="time_frame", weighted=False
+    ):
         self.train_protocol = pd.read_csv(protocol_file_path, sep=" ", header=None)
         self.data_path = data_path
         self.data_type = data_type
+
+        if weighted:
+            set = "test"
+            if "val" in protocol_file_path:
+                set = "validate"
+            elif "train" in protocol_file_path:
+                set = "train"
+
+            subset = os.path.join(
+                "/".join(protocol_file_path.split("/")[:-4]),
+                "subset",
+                f"{set}_subset.csv",
+            )
+
+            subset = np.genfromtxt(subset, delimiter=",", dtype=str)
+
+            self.train_protocol = self.train_protocol.loc[
+                self.train_protocol[1].isin(subset)
+            ]
+
+            print(f"Length of LA 21 subset: {len(self.train_protocol.index)}")
 
     def __len__(self):
         return self.train_protocol.shape[0]
@@ -47,10 +72,33 @@ class PrepASV21Dataset(Dataset):
 
 
 class PrepASV19Dataset(Dataset):
-    def __init__(self, protocol_file_path, data_path, data_type="time_frame"):
+    def __init__(
+        self, protocol_file_path, data_path, data_type="time_frame", weighted=False
+    ):
         self.train_protocol = pd.read_csv(protocol_file_path, sep=" ", header=None)
         self.data_path = data_path
         self.data_type = data_type
+
+        if weighted:
+            set = "test"
+            if "dev" in protocol_file_path:
+                set = "validate"
+            elif "train" in protocol_file_path:
+                set = "train"
+
+            subset = os.path.join(
+                "/".join(protocol_file_path.split("/")[:-2]),
+                "subset",
+                f"{set}_subset.csv",
+            )
+
+            subset = np.genfromtxt(subset, delimiter=",", dtype=str)
+
+            self.train_protocol = self.train_protocol.loc[
+                self.train_protocol[1].isin(subset)
+            ]
+
+            print(f"Length of LA 19 subset: {len(self.train_protocol.index)}")
 
     def __len__(self):
         return self.train_protocol.shape[0]
@@ -88,10 +136,33 @@ class PrepASV19Dataset(Dataset):
 
 
 class PrepASV15Dataset(Dataset):
-    def __init__(self, protocol_file_path, data_path, data_type="time_frame"):
+    def __init__(
+        self, protocol_file_path, data_path, data_type="time_frame", weighted=False
+    ):
         self.train_protocol = pd.read_csv(protocol_file_path, sep=" ", header=None)
         self.data_path = data_path
         self.data_type = data_type
+
+        if weighted:
+            set = "test"
+            if "dev" in protocol_file_path:
+                set = "validate"
+            elif "train" in protocol_file_path:
+                set = "train"
+
+            subset = os.path.join(
+                "/".join(protocol_file_path.split("/")[:-2]),
+                "subset",
+                f"{set}_subset.csv",
+            )
+
+            subset = np.genfromtxt(subset, delimiter=",", dtype=str)
+
+            self.train_protocol = self.train_protocol.loc[
+                self.train_protocol[0].isin(subset)
+            ]
+
+            print(f"Length of LA subset: {len(subset)}")
 
     def __len__(self):
         return self.train_protocol.shape[0]

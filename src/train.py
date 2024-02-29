@@ -81,8 +81,21 @@ def train(config, config_name, vocal=False):
 
     f = open("{}/{}.csv".format(log_path, time_name), "w+")
 
-    print("Training started...")
     best_model_save_path = ""
+    if num_epoch == 0:
+        net_str = "raw.pth"
+        torch.save(
+            {
+                "epoch": 0,
+                "model_state_dict": Net.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "scheduler_state_dict": scheduler.state_dict(),
+            },
+            ("{}/{}".format(save_path, net_str)),
+        )
+        best_model_save_path = "{}/{}".format(save_path, net_str)
+
+    print("Training started...")
     for epoch in range(num_epoch):
         Net.train()
         t = time.time()

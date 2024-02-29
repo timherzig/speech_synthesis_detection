@@ -9,10 +9,33 @@ from torch.utils.data.dataloader import Dataset
 
 
 class FakeOrRealDataset(Dataset):
-    def __init__(self, protocol_file_path, data_path, data_type="time_frame"):
+    def __init__(
+        self, protocol_file_path, data_path, data_type="time_frame", weighted=False
+    ):
         self.protocol = pd.read_csv(protocol_file_path)
         self.data_path = data_path
         self.data_type = data_type
+
+        if weighted:
+            set = "test"
+            if "val" in protocol_file_path:
+                set = "validate"
+            elif "train" in protocol_file_path:
+                set = "train"
+
+            subset = os.path.join(
+                "/".join(protocol_file_path.split("/")[:-1]),
+                "subset",
+                f"{set}_subset.csv",
+            )
+            subset = np.genfromtxt(subset, delimiter=",", dtype=str)
+
+            self.protocol["tmp"] = self.protocol["file"].apply(
+                lambda x: x.split(".")[0]
+            )
+            self.protocol = self.protocol[self.protocol["tmp"].isin(subset)]
+
+            print(f"Length of FakeOrReal subset: {len(self.protocol.index)}")
 
     def __len__(self):
         return len(self.protocol.index)
